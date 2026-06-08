@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ACHIEVEMENTS } from "@/data/achievements";
+import { useAuthStore } from "@/store/authStore";
+import { createClient } from "@/lib/supabase/client";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
 const CATEGORIES = [
   { id: "all", label: "All", emoji: "🏆" },
@@ -15,8 +17,52 @@ const CATEGORIES = [
 ] as const;
 
 export default function AchievementsPage() {
+  const profile = useAuthStore((s) => s.profile);
   const [activeCategory, setActiveCategory] = useState<string>("all");
-  const unlockedSlugs = new Set(["streak_3", "lessons_1", "xp_100", "province_1"]);
+  const [unlockedSlugs, setUnlockedSlugs] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!profile) return;
+    const supabase = createClient();
+
+    supabase
+      .from("user_achievements")
+      .select("achievement_id")
+      .eq("user_id", profile.id)
+      .then(({ data }) => {
+        // user_achievements stores achievement_id (UUID), match against ACHIEVEMENTS by checking
+        // We also store slugs — check both approaches. First try to get achievements with their slugs.
+        if (!data || data.length === 0) { setLoading(false); return; }
+
+        const achievementIds = data.map((r) => r.achievement_id);
+
+        supabase
+          .from("achievements")
+          .select("slug")
+          .in("id", achievementIds)
+          .then(({ data: achData }) => {
+            const slugs = new Set((achData ?? []).map((a) => a.slug));
+            setUnlockedSlugs(slugs);
+            setLoading(false);
+          });
+      });
+  }, [profile?.id]);
+
+  // Also auto-unlock achievements based on current profile stats (client-side check)
+  useEffect(() => {
+    if (!profile || loading) return;
+    const earned = new Set(unlockedSlugs);
+
+    if (profile.current_streak >= 3) earned.add("streak_3");
+    if (profile.current_streak >= 7) earned.add("streak_7");
+    if (profile.current_streak >= 30) earned.add("streak_30");
+    if (profile.total_xp >= 100) earned.add("xp_100");
+    if (profile.total_xp >= 500) earned.add("xp_500");
+    if (profile.total_xp >= 1000) earned.add("xp_1000");
+
+    setUnlockedSlugs(earned);
+  }, [profile, loading]);
 
   const filtered = ACHIEVEMENTS.filter(
     (a) => activeCategory === "all" || a.category === activeCategory
@@ -25,6 +71,8 @@ export default function AchievementsPage() {
   const totalXPFromAchievements = ACHIEVEMENTS
     .filter((a) => unlockedSlugs.has(a.slug))
     .reduce((sum, a) => sum + a.xp_reward, 0);
+
+  if (loading) return <div className="flex justify-center py-20"><LoadingSpinner /></div>;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
@@ -41,7 +89,6 @@ export default function AchievementsPage() {
         </div>
       </div>
 
-      {/* Category filter */}
       <div className="flex flex-wrap gap-2">
         {CATEGORIES.map((cat) => (
           <button
@@ -60,7 +107,6 @@ export default function AchievementsPage() {
         ))}
       </div>
 
-      {/* Achievement grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {filtered.map((ach, i) => {
           const isUnlocked = unlockedSlugs.has(ach.slug);
@@ -72,9 +118,7 @@ export default function AchievementsPage() {
               transition={{ delay: i * 0.04 }}
               className={cn(
                 "flex items-center gap-4 p-4 rounded-2xl border transition-all",
-                isUnlocked
-                  ? "bg-white border-gray-100 shadow-sm"
-                  : "bg-gray-50 border-gray-100 opacity-50"
+                isUnlocked ? "bg-white border-gray-100 shadow-sm" : "bg-gray-50 border-gray-100 opacity-50"
               )}
             >
               <div className={cn(

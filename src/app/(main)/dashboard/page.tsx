@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Flame, BookOpen, Clock, Trophy, Zap, Map, Star } from "lucide-react";
+import { BookOpen, Clock, Zap, Map, Flame } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import { createClient } from "@/lib/supabase/client";
@@ -14,26 +14,68 @@ import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/shared/ProgressBar";
 import { xpProgressInLevel, formatNumber } from "@/lib/utils";
 
-function generateWeekData() {
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  return days.map((day, i) => ({
-    day,
-    xp: i < 5 ? Math.floor(Math.random() * 80) + 10 : Math.floor(Math.random() * 30),
-  }));
-}
+interface DayXP { day: string; xp: number; }
+
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function DashboardPage() {
   const profile = useAuthStore((s) => s.profile);
-  const [weekData] = useState(generateWeekData());
-  const [todayMinutes] = useState(Math.floor(Math.random() * 20));
+  const [weekData, setWeekData] = useState<DayXP[]>([]);
+  const [todayMinutes, setTodayMinutes] = useState(0);
+  const [provincesCount, setProvincesCount] = useState(0);
+  const [totalMinutes, setTotalMinutes] = useState(0);
+
+  useEffect(() => {
+    if (!profile) return;
+    const supabase = createClient();
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    const sevenDaysAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
+    // Weekly XP + today minutes from daily_activity
+    supabase
+      .from("daily_activity")
+      .select("activity_date, xp_earned, minutes_studied")
+      .eq("user_id", profile.id)
+      .gte("activity_date", sevenDaysAgo)
+      .then(({ data }) => {
+        const byDate: Record<string, { xp: number; mins: number }> = {};
+        data?.forEach((row) => {
+          byDate[row.activity_date] = { xp: row.xp_earned, mins: row.minutes_studied };
+        });
+
+        // Build last 7 days array
+        const week: DayXP[] = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+          const key = d.toISOString().split("T")[0];
+          week.push({ day: DAYS[d.getDay()], xp: byDate[key]?.xp ?? 0 });
+        }
+        setWeekData(week);
+        setTodayMinutes(byDate[todayStr]?.mins ?? 0);
+
+        // Total minutes studied
+        const total = data?.reduce((sum, r) => sum + (r.minutes_studied ?? 0), 0) ?? 0;
+        setTotalMinutes(total);
+      });
+
+    // Provinces count
+    supabase
+      .from("user_provinces")
+      .select("province_id", { count: "exact", head: true })
+      .eq("user_id", profile.id)
+      .then(({ count }) => setProvincesCount(count ?? 0));
+  }, [profile?.id]);
 
   if (!profile) return null;
 
   const { current, needed, pct } = xpProgressInLevel(profile.total_xp);
+  const hoursStudied = Math.floor(totalMinutes / 60);
+  const minsRemainder = totalMinutes % 60;
+  const timeDisplay = hoursStudied > 0 ? `${hoursStudied}h${minsRemainder > 0 ? ` ${minsRemainder}m` : ""}` : `${totalMinutes}m`;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      {/* Welcome header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -57,7 +99,6 @@ export default function DashboardPage() {
         </Link>
       </motion.div>
 
-      {/* Top row: Goal ring + Level progress + Streak */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -100,15 +141,13 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
-      {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard label="Total XP" value={formatNumber(profile.total_xp)} icon={Zap} color="orange" />
         <StatsCard label="Best Streak" value={`${profile.longest_streak}d`} icon={Flame} color="red" />
-        <StatsCard label="Time Studied" value="12h" icon={Clock} color="blue" />
-        <StatsCard label="Provinces" value="3" icon={Map} color="green" />
+        <StatsCard label="Time Studied" value={totalMinutes > 0 ? timeDisplay : "0m"} icon={Clock} color="blue" />
+        <StatsCard label="Provinces" value={String(provincesCount)} icon={Map} color="green" />
       </div>
 
-      {/* XP Chart */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -119,7 +158,6 @@ export default function DashboardPage() {
         <XPChart data={weekData} />
       </motion.div>
 
-      {/* Quick actions */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
