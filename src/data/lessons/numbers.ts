@@ -1,0 +1,30 @@
+export const THAI_NUMBERS = [
+  { digit: 0, thai: "๐", word: "ศูนย์", romanization: "soon" },
+  { digit: 1, thai: "๑", word: "หนึ่ง", romanization: "neung" },
+  { digit: 2, thai: "๒", word: "สอง", romanization: "song" },
+  { digit: 3, thai: "๓", word: "สาม", romanization: "sam" },
+  { digit: 4, thai: "๔", word: "สี่", romanization: "see" },
+  { digit: 5, thai: "๕", word: "ห้า", romanization: "ha" },
+  { digit: 6, thai: "๖", word: "หก", romanization: "hok" },
+  { digit: 7, thai: "๗", word: "เจ็ด", romanization: "jet" },
+  { digit: 8, thai: "๘", word: "แปด", romanization: "paet" },
+  { digit: 9, thai: "๙", word: "เก้า", romanization: "gao" },
+  { digit: 10, thai: "๑๐", word: "สิบ", romanization: "sip" },
+  { digit: 11, thai: "๑๑", word: "สิบเอ็ด", romanization: "sip-et" },
+  { digit: 12, thai: "๑๒", word: "สิบสอง", romanization: "sip-song" },
+  { digit: 20, thai: "๒๐", word: "ยี่สิบ", romanization: "yee-sip" },
+  { digit: 21, thai: "๒๑", word: "ยี่สิบเอ็ด", romanization: "yee-sip-et" },
+  { digit: 30, thai: "๓๐", word: "สามสิบ", romanization: "sam-sip" },
+  { digit: 100, thai: "๑๐๐", word: "หนึ่งร้อย", romanization: "neung-roi" },
+  { digit: 1000, thai: "๑,๐๐๐", word: "หนึ่งพัน", romanization: "neung-pan" },
+  { digit: 10000, thai: "๑๐,๐๐๐", word: "หนึ่งหมื่น", romanization: "neung-meun" },
+];
+
+export const NUMBER_CLASSIFIERS = [
+  { classifier: "คน", romanization: "khon", use: "people", example: "นักเรียนสองคน = two students" },
+  { classifier: "ตัว", romanization: "tua", use: "animals, clothing", example: "แมวสองตัว = two cats" },
+  { classifier: "อัน", romanization: "an", use: "small objects", example: "ปากกาสามอัน = three pens" },
+  { classifier: "เล่ม", romanization: "lem", use: "books, sharp objects", example: "หนังสือสี่เล่ม = four books" },
+  { classifier: "ใบ", romanization: "bai", use: "leaves, flat objects, bowls", example: "จานสามใบ = three plates" },
+  { classifier: "ขวด", romanization: "khuat", use: "bottles", example: "น้ำสองขวด = two bottles of water" },
+];

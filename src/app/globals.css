@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* =============================================
+   ThaiJourney Design Tokens & Custom Styles
+   ============================================= */
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #f97316;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --radius: 0.75rem;
+
+  /* Brand palette */
+  --thai-gold: #F59E0B;
+  --thai-orange: #EA580C;
+  --thai-red: #DC2626;
+  --thai-green: #16A34A;
+  --thai-blue: #2563EB;
+}
+
+* {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), "Sarabun", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =============================================
+   Thai Font Support
+   ============================================= */
+.thai-text {
+  font-family: "Sarabun", "Noto Sans Thai", "TH Sarabun New", sans-serif;
+  font-size: 1.1em;
+  line-height: 1.8;
+}
+
+/* =============================================
+   Custom Scrollbar
+   ============================================= */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* =============================================
+   Gradient Utilities
+   ============================================= */
+.gradient-thai {
+  background: linear-gradient(135deg, #EA580C 0%, #F59E0B 50%, #DC2626 100%);
+}
+
+.gradient-thai-soft {
+  background: linear-gradient(135deg, #FED7AA 0%, #FEF3C7 50%, #FECACA 100%);
+}
+
+/* =============================================
+   XP / Progress Bar
+   ============================================= */
+.xp-bar {
+  background: linear-gradient(90deg, #F59E0B, #EA580C);
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =============================================
+   Glass Morphism
+   ============================================= */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* =============================================
+   Keyframe Animations
+   ============================================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-ring { animation: pulse-ring 1.5s ease-out infinite; }
+.animate-shake { animation: shake 0.4s ease-in-out; }
+.animate-bounce-in { animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+
+/* =============================================
+   Utility overrides for Tailwind v4 compat
+   ============================================= */
+.border-border { border-color: var(--border); }
+.bg-background { background-color: var(--background); }
+.text-foreground { color: var(--foreground); }
+.bg-card { background-color: var(--card); }
+.text-card-foreground { color: var(--card-foreground); }
+.text-muted-foreground { color: var(--muted-foreground); }
+.bg-muted { background-color: var(--muted); }
+.ring-ring { --tw-ring-color: var(--ring); }
+
+/* Radix UI safe area */
+.safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
