@@ -22,14 +22,18 @@ Always end with a follow-up question or practice suggestion to keep the student 
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
     const { messages } = await req.json();
     if (!Array.isArray(messages)) {
       return NextResponse.json({ error: "Invalid messages format" }, { status: 400 });
     }
+
+    // Get user for saving chat history (optional — don't block if auth fails)
+    let user: { id: string } | null = null;
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    } catch { /* no session — still respond */ }
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -58,10 +62,21 @@ export async function POST(req: NextRequest) {
     const data = await res.json();
     const message = data.choices?.[0]?.message?.content ?? "";
 
-    await supabase.from("chat_messages").insert([
-      { user_id: user.id, role: "user", content: messages[messages.length - 1].content },
-      { user_id: user.id, role: "assistant", content: message },
-    ]);
+    if (!message) {
+      console.error("OpenRouter empty response:", JSON.stringify(data));
+      return NextResponse.json({ error: "Empty response from AI" }, { status: 502 });
+    }
+
+    // Save chat history if user is authenticated
+    if (user) {
+      try {
+        const supabase = await createClient();
+        await supabase.from("chat_messages").insert([
+          { user_id: user.id, role: "user", content: messages[messages.length - 1].content },
+          { user_id: user.id, role: "assistant", content: message },
+        ]);
+      } catch { /* skip if save fails */ }
+    }
 
     return NextResponse.json({ message });
   } catch (error) {

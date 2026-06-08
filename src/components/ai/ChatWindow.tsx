@@ -60,9 +60,10 @@ export function ChatWindow() {
         }),
       });
       const data = await res.json();
+      const reply = data.message || data.error || "ขอโทษครับ — something went wrong. Please try again.";
       setMessages((prev) => [
         ...prev,
-        { id: (Date.now() + 1).toString(), role: "assistant", content: data.message, timestamp: new Date() },
+        { id: (Date.now() + 1).toString(), role: "assistant", content: reply, timestamp: new Date() },
       ]);
     } catch {
       setMessages((prev) => [
