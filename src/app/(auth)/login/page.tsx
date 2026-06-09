@@ -22,11 +22,15 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 async function createSession(idToken: string) {
-  await fetch("/api/auth/session", {
+  const res = await fetch("/api/auth/session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ idToken }),
   });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? "Session creation failed");
+  }
 }
 
 export default function LoginPage() {
@@ -48,10 +52,11 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (e: unknown) {
       const code = (e as { code?: string }).code ?? "";
+      const msg = (e as { message?: string }).message ?? "";
       if (code.includes("user-not-found") || code.includes("wrong-password") || code.includes("invalid-credential")) {
         setError("Invalid email or password");
       } else {
-        setError("Sign in failed. Please try again.");
+        setError(msg || "Sign in failed. Please try again.");
       }
     }
   };

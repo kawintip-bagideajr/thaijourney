@@ -28,11 +28,15 @@ const signupSchema = z.object({
 type SignupForm = z.infer<typeof signupSchema>;
 
 async function createSession(idToken: string) {
-  await fetch("/api/auth/session", {
+  const res = await fetch("/api/auth/session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ idToken }),
   });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? "Session creation failed");
+  }
 }
 
 async function createUserProfile(uid: string, username: string) {
@@ -80,12 +84,13 @@ export default function SignupPage() {
       router.push("/dashboard");
     } catch (e: unknown) {
       const code = (e as { code?: string }).code ?? "";
+      const msg = (e as { message?: string }).message ?? "";
       if (code.includes("email-already-in-use")) {
         setError("This email is already registered. Try signing in.");
       } else if (code.includes("weak-password")) {
         setError("Password is too weak.");
       } else {
-        setError("Sign up failed. Please try again.");
+        setError(msg || "Sign up failed. Please try again.");
       }
     }
   };
