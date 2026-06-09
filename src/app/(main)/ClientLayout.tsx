@@ -8,10 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
 import { PageLoader } from "@/components/shared/LoadingSpinner";
 
-const SUPABASE_CONFIGURED = !!(
-  process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")
-);
+const FIREBASE_CONFIGURED = !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
 const DEMO_PROFILE = {
   id: "demo-user",
@@ -39,7 +36,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!SUPABASE_CONFIGURED) {
+    if (!FIREBASE_CONFIGURED) {
       setProfile(DEMO_PROFILE);
       return;
     }
@@ -48,11 +45,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
   }, [profile, isLoading, router, setProfile]);
 
-  const displayProfile = profile ?? (!SUPABASE_CONFIGURED ? DEMO_PROFILE : null);
+  const displayProfile = profile ?? (!FIREBASE_CONFIGURED ? DEMO_PROFILE : null);
 
-  if (!SUPABASE_CONFIGURED && !displayProfile) return <PageLoader />;
-  if (SUPABASE_CONFIGURED && isLoading) return <PageLoader />;
-  if (SUPABASE_CONFIGURED && !profile) return null;
+  if (!FIREBASE_CONFIGURED && !displayProfile) return <PageLoader />;
+  if (FIREBASE_CONFIGURED && isLoading) return <PageLoader />;
+  if (FIREBASE_CONFIGURED && !profile) return null;
 
   return (
     <div className="flex min-h-screen bg-gray-50">

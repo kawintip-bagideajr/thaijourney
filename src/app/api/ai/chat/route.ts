@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromSession, adminDb } from "@/lib/firebase/server";
+import { cookies } from "next/headers";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL ?? "google/gemini-2.0-flash-exp:free";
@@ -27,13 +28,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid messages format" }, { status: 400 });
     }
 
-    // Get user for saving chat history (optional — don't block if auth fails)
-    let user: { id: string } | null = null;
-    try {
-      const supabase = await createClient();
-      const { data } = await supabase.auth.getUser();
-      user = data.user;
-    } catch { /* no session — still respond */ }
+    const cookieStore = await cookies();
+    const user = await getUserFromSession(cookieStore.get("__session")?.value);
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -67,14 +63,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Empty response from AI" }, { status: 502 });
     }
 
-    // Save chat history if user is authenticated
     if (user) {
       try {
-        const supabase = await createClient();
-        await supabase.from("chat_messages").insert([
-          { user_id: user.id, role: "user", content: messages[messages.length - 1].content },
-          { user_id: user.id, role: "assistant", content: message },
-        ]);
+        const batch = adminDb.batch();
+        const userMsg = adminDb.collection("chat_messages").doc();
+        const aiMsg = adminDb.collection("chat_messages").doc();
+        const now = new Date().toISOString();
+        batch.set(userMsg, { user_id: user.uid, role: "user", content: messages[messages.length - 1].content, created_at: now });
+        batch.set(aiMsg, { user_id: user.uid, role: "assistant", content: message, created_at: now });
+        await batch.commit();
       } catch { /* skip if save fails */ }
     }
 

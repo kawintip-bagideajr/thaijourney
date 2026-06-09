@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { useAuthStore } from "@/store/authStore";
-import { createClient } from "@/lib/supabase/client";
+import { db } from "@/lib/firebase/client";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
 
@@ -24,29 +25,17 @@ export default function AchievementsPage() {
 
   useEffect(() => {
     if (!profile) return;
-    const supabase = createClient();
 
-    supabase
-      .from("user_achievements")
-      .select("achievement_id")
-      .eq("user_id", profile.id)
-      .then(({ data }) => {
-        // user_achievements stores achievement_id (UUID), match against ACHIEVEMENTS by checking
-        // We also store slugs — check both approaches. First try to get achievements with their slugs.
-        if (!data || data.length === 0) { setLoading(false); return; }
-
-        const achievementIds = data.map((r) => r.achievement_id);
-
-        supabase
-          .from("achievements")
-          .select("slug")
-          .in("id", achievementIds)
-          .then(({ data: achData }) => {
-            const slugs = new Set((achData ?? []).map((a) => a.slug));
-            setUnlockedSlugs(slugs);
-            setLoading(false);
-          });
-      });
+    // Fetch unlocked achievements from Firestore (stored by achievement slug)
+    const q = query(
+      collection(db, "user_achievements"),
+      where("user_id", "==", profile.id)
+    );
+    getDocs(q).then((snap) => {
+      const slugs = new Set(snap.docs.map((doc) => doc.data().achievement_slug as string));
+      setUnlockedSlugs(slugs);
+      setLoading(false);
+    });
   }, [profile?.id]);
 
   // Also auto-unlock achievements based on current profile stats (client-side check)

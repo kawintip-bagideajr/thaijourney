@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can read/write their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Daily activity - user can read/write their own
+    match /daily_activity/{docId} {
+      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
+    }
+
+    // Lesson progress - user can read/write their own
+    match /user_lesson_progress/{docId} {
+      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
+    }
+
+    // Achievements - user can read their own
+    match /user_achievements/{docId} {
+      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
+    }
+
+    // Provinces - user can read their own
+    match /user_provinces/{docId} {
+      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
+    }
+
+    // Chat messages - user can read/write their own
+    match /chat_messages/{docId} {
+      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
+    }
+
+    // XP transactions - user can read their own (server writes only)
+    match /xp_transactions/{docId} {
+      allow read: if request.auth != null && resource.data.user_id == request.auth.uid;
+    }
+
+    // Leaderboard - all authenticated users can read daily_activity
+    match /daily_activity/{docId} {
+      allow read: if request.auth != null;
+    }
+  }
+}

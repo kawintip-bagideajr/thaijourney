@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromSession } from "@/lib/firebase/server";
+import { cookies } from "next/headers";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const cookieStore = await cookies();
+    const user = await getUserFromSession(cookieStore.get("__session")?.value);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { text } = await req.json();

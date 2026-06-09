@@ -1,102 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { getUserFromSession, adminDb } from "@/lib/firebase/server";
+import { FieldValue } from "firebase-admin/firestore";
+import { cookies } from "next/headers";
 import { levelFromXP } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const admin = await createAdminClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const cookieStore = await cookies();
+    const user = await getUserFromSession(cookieStore.get("__session")?.value);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { lessonSlug, moduleSlug, xpEarned, mistakes, timeMs } = await req.json();
+    const userId = user.uid;
 
     // Get current profile
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("total_xp, level, current_streak, longest_streak, daily_goal_minutes")
-      .eq("id", user.id)
-      .single();
+    const profileDoc = await adminDb.collection("users").doc(userId).get();
+    if (!profileDoc.exists) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
-    if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-
-    const newXP = profile.total_xp + (xpEarned ?? 0);
+    const profile = profileDoc.data()!;
+    const newXP = (profile.total_xp ?? 0) + (xpEarned ?? 0);
     const newLevel = levelFromXP(newXP);
-    const leveledUp = newLevel > profile.level;
+    const leveledUp = newLevel > (profile.level ?? 1);
 
     // Update profile XP & level
-    await admin.from("profiles").update({ total_xp: newXP, level: newLevel }).eq("id", user.id);
+    await adminDb.collection("users").doc(userId).update({
+      total_xp: newXP,
+      level: newLevel,
+      updated_at: new Date().toISOString(),
+    });
 
     // Log XP transaction
-    await admin.from("xp_transactions").insert({
-      user_id: user.id,
+    await adminDb.collection("xp_transactions").add({
+      user_id: userId,
       amount: xpEarned,
       reason: `lesson_${lessonSlug ?? "unknown"}`,
       metadata: { lessonSlug, moduleSlug, mistakes, timeMs },
+      created_at: new Date().toISOString(),
     });
 
     // Update daily activity
     const today = new Date().toISOString().split("T")[0];
-    const { data: existing } = await admin
-      .from("daily_activity")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("activity_date", today)
-      .single();
+    const activityId = `${userId}_${today}`;
+    const activityRef = adminDb.collection("daily_activity").doc(activityId);
+    const activityDoc = await activityRef.get();
 
-    let newStreak = profile.current_streak;
+    let newStreak = profile.current_streak ?? 0;
 
-    if (existing) {
-      await admin.from("daily_activity").update({
-        xp_earned: existing.xp_earned + xpEarned,
-        lessons_completed: existing.lessons_completed + 1,
-        minutes_studied: existing.minutes_studied + Math.round((timeMs ?? 0) / 60000),
-      }).eq("user_id", user.id).eq("activity_date", today);
+    if (activityDoc.exists) {
+      await activityRef.update({
+        xp_earned: FieldValue.increment(xpEarned ?? 0),
+        lessons_completed: FieldValue.increment(1),
+        minutes_studied: FieldValue.increment(Math.round((timeMs ?? 0) / 60000)),
+      });
     } else {
-      await admin.from("daily_activity").insert({
-        user_id: user.id,
+      await activityRef.set({
+        user_id: userId,
         activity_date: today,
-        xp_earned: xpEarned,
+        xp_earned: xpEarned ?? 0,
         lessons_completed: 1,
         minutes_studied: Math.round((timeMs ?? 0) / 60000),
       });
 
       // Update streak
       const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-      const { data: yesterdayActivity } = await admin
-        .from("daily_activity")
-        .select("activity_date")
-        .eq("user_id", user.id)
-        .eq("activity_date", yesterday)
-        .single();
+      const yesterdayDoc = await adminDb.collection("daily_activity").doc(`${userId}_${yesterday}`).get();
+      newStreak = yesterdayDoc.exists ? (profile.current_streak ?? 0) + 1 : 1;
 
-      newStreak = yesterdayActivity ? profile.current_streak + 1 : 1;
-      await admin.from("profiles").update({
+      await adminDb.collection("users").doc(userId).update({
         current_streak: newStreak,
-        longest_streak: Math.max(profile.longest_streak, newStreak),
-      }).eq("id", user.id);
+        longest_streak: Math.max(profile.longest_streak ?? 0, newStreak),
+      });
     }
 
-    // Try to record lesson progress by slug (optional — skip if lesson not in DB)
-    try {
-      const { data: lessonRow } = await admin
-        .from("lessons")
-        .select("id")
-        .eq("slug", lessonSlug)
-        .single();
-
-      if (lessonRow) {
-        await admin.from("user_lesson_progress").upsert({
-          user_id: user.id,
-          lesson_id: lessonRow.id,
-          status: mistakes === 0 ? "mastered" : "completed",
-          score: Math.max(0, 100 - mistakes * 10),
-          attempts: 1,
-          completed_at: new Date().toISOString(),
-        }, { onConflict: "user_id,lesson_id" });
-      }
-    } catch {
-      // Lesson not in DB yet — skip, XP still saved
+    // Record lesson progress (bug fix: use FieldValue.increment for attempts)
+    if (lessonSlug) {
+      const progressId = `${userId}_${lessonSlug}`;
+      await adminDb.collection("user_lesson_progress").doc(progressId).set({
+        user_id: userId,
+        lesson_slug: lessonSlug,
+        module_slug: moduleSlug ?? null,
+        status: mistakes === 0 ? "mastered" : "completed",
+        score: Math.max(0, 100 - (mistakes ?? 0) * 10),
+        attempts: FieldValue.increment(1),
+        completed_at: new Date().toISOString(),
+      }, { merge: true });
     }
 
     return NextResponse.json({ xpEarned, newXP, newLevel, leveledUp, newStreak });

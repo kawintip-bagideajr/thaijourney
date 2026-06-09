@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { CheckCircle, Star, BookOpen, Headphones, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
-import { createClient } from "@/lib/supabase/client";
+import { db } from "@/lib/firebase/client";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -81,28 +82,16 @@ export default function LearnPage() {
 
   useEffect(() => {
     if (!profile) return;
-    const supabase = createClient();
 
-    // Get all completed lesson IDs for this user
-    // Lessons are stored by slug in user_lesson_progress
-    supabase
-      .from("user_lesson_progress")
-      .select("lesson_id, status")
-      .eq("user_id", profile.id)
-      .in("status", ["completed", "mastered"])
-      .then(({ data }) => {
-        if (!data || data.length === 0) return;
-        // Fetch lesson slugs to map back to our local IDs
-        const lessonIds = data.map((r) => r.lesson_id);
-        supabase
-          .from("lessons")
-          .select("id, slug")
-          .in("id", lessonIds)
-          .then(({ data: lessons }) => {
-            const slugs = new Set((lessons ?? []).map((l) => l.slug));
-            setCompletedLessons(slugs);
-          });
-      });
+    const q = query(
+      collection(db, "user_lesson_progress"),
+      where("user_id", "==", profile.id),
+      where("status", "in", ["completed", "mastered"])
+    );
+    getDocs(q).then((snap) => {
+      const slugs = new Set(snap.docs.map((doc) => doc.data().lesson_slug as string));
+      setCompletedLessons(slugs);
+    });
   }, [profile?.id]);
 
   const tracks = [

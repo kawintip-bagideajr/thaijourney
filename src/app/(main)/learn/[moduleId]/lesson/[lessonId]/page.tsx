@@ -12,7 +12,6 @@ import { PronunciationPractice } from "@/components/exercises/PronunciationPract
 import { Button } from "@/components/ui/button";
 import { GREETINGS_EXERCISES } from "@/data/lessons/greetings";
 import { useAuthStore } from "@/store/authStore";
-import { createClient } from "@/lib/supabase/client";
 import type { ActiveExercise } from "@/types/lesson";
 import type { MultipleChoiceOptions, MatchPairsOptions, DragDropOptions } from "@/types/lesson";
 

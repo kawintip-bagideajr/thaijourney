@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { BookOpen, Clock, Zap, Map, Flame } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
-import { createClient } from "@/lib/supabase/client";
+import { db } from "@/lib/firebase/client";
+import { collection, query, where, getDocs, getCountFromServer } from "firebase/firestore";
 import { GoalRing } from "@/components/dashboard/GoalRing";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { XPChart } from "@/components/dashboard/XPChart";
@@ -27,44 +28,42 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!profile) return;
-    const supabase = createClient();
     const today = new Date();
     const todayStr = today.toISOString().split("T")[0];
     const sevenDaysAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
-    // Weekly XP + today minutes from daily_activity
-    supabase
-      .from("daily_activity")
-      .select("activity_date, xp_earned, minutes_studied")
-      .eq("user_id", profile.id)
-      .gte("activity_date", sevenDaysAgo)
-      .then(({ data }) => {
-        const byDate: Record<string, { xp: number; mins: number }> = {};
-        data?.forEach((row) => {
-          byDate[row.activity_date] = { xp: row.xp_earned, mins: row.minutes_studied };
-        });
-
-        // Build last 7 days array
-        const week: DayXP[] = [];
-        for (let i = 6; i >= 0; i--) {
-          const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-          const key = d.toISOString().split("T")[0];
-          week.push({ day: DAYS[d.getDay()], xp: byDate[key]?.xp ?? 0 });
-        }
-        setWeekData(week);
-        setTodayMinutes(byDate[todayStr]?.mins ?? 0);
-
-        // Total minutes studied
-        const total = data?.reduce((sum, r) => sum + (r.minutes_studied ?? 0), 0) ?? 0;
-        setTotalMinutes(total);
+    // Weekly XP + today minutes
+    const activityQuery = query(
+      collection(db, "daily_activity"),
+      where("user_id", "==", profile.id),
+      where("activity_date", ">=", sevenDaysAgo)
+    );
+    getDocs(activityQuery).then((snap) => {
+      const byDate: Record<string, { xp: number; mins: number }> = {};
+      snap.docs.forEach((doc) => {
+        const d = doc.data();
+        byDate[d.activity_date] = { xp: d.xp_earned ?? 0, mins: d.minutes_studied ?? 0 };
       });
 
+      const week: DayXP[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+        const key = d.toISOString().split("T")[0];
+        week.push({ day: DAYS[d.getDay()], xp: byDate[key]?.xp ?? 0 });
+      }
+      setWeekData(week);
+      setTodayMinutes(byDate[todayStr]?.mins ?? 0);
+
+      const total = snap.docs.reduce((sum, doc) => sum + (doc.data().minutes_studied ?? 0), 0);
+      setTotalMinutes(total);
+    });
+
     // Provinces count
-    supabase
-      .from("user_provinces")
-      .select("province_id", { count: "exact", head: true })
-      .eq("user_id", profile.id)
-      .then(({ count }) => setProvincesCount(count ?? 0));
+    const provincesQuery = query(
+      collection(db, "user_provinces"),
+      where("user_id", "==", profile.id)
+    );
+    getCountFromServer(provincesQuery).then((snap) => setProvincesCount(snap.data().count));
   }, [profile?.id]);
 
   if (!profile) return null;

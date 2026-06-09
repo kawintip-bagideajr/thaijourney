@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion } from "framer-motion";
 import { Loader2, Mail } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { auth } from "@/lib/firebase/client";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -15,16 +16,13 @@ type Form = z.infer<typeof schema>;
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
-  const supabase = createClient();
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Form>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: Form) => {
-    await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    await sendPasswordResetEmail(auth, data.email);
     setSent(true);
   };
 
@@ -41,7 +39,7 @@ export default function ForgotPasswordPage() {
         <>
           <div>
             <h1 className="text-3xl font-black text-gray-900">Reset Password</h1>
-            <p className="text-gray-500 mt-1">We'll send a reset link to your email</p>
+            <p className="text-gray-500 mt-1">We&apos;ll send a reset link to your email</p>
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
