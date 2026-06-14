@@ -16,14 +16,30 @@ type Form = z.infer<typeof schema>;
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Form>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: Form) => {
-    await sendPasswordResetEmail(auth, data.email);
-    setSent(true);
+    setError("");
+    try {
+      await sendPasswordResetEmail(auth, data.email.trim());
+      setSent(true);
+    } catch (e: unknown) {
+      const code = (e as { code?: string }).code ?? "";
+      if (code.includes("operation-not-allowed")) {
+        setError("Password reset is not available. Try signing in with Google instead.");
+      } else if (code.includes("invalid-email")) {
+        setError("Please enter a valid email address.");
+      } else if (code.includes("too-many-requests")) {
+        setError("Too many requests. Please wait a few minutes.");
+      } else {
+        // Don't reveal if email exists — just show success for security
+        setSent(true);
+      }
+    }
   };
 
   return (
@@ -47,6 +63,9 @@ export default function ForgotPasswordPage() {
               <Input type="email" placeholder="you@example.com" {...register("email")} />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">{error}</div>
+            )}
             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Send Reset Link"}
             </Button>

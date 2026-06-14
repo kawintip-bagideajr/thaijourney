@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex overflow-x-hidden">
       {/* Left: decorative panel (desktop only) */}
       <div className="hidden lg:flex lg:w-1/2 gradient-thai flex-col items-center justify-center p-12 text-white">
         <div className="max-w-md text-center">
@@ -27,9 +27,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
       </div>
 
-      {/* Right: auth form */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
+      {/* Right: auth form — scrollable on small screens */}
+      <div className="flex-1 flex flex-col justify-center overflow-y-auto overflow-x-hidden px-5 py-8 sm:px-8">
+        <div className="w-full max-w-md mx-auto">
           {children}
         </div>
       </div>

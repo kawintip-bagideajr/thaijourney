@@ -1,9 +1,10 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Lock, MapPin, Star } from "lucide-react";
+import { X, Lock, MapPin, Star, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProvinceData } from "@/data/provinces";
 import { cn } from "@/lib/utils";
+import { speakThai } from "@/lib/speech";
 
 interface ProvinceModalProps {
   province: ProvinceData | null;
@@ -70,7 +71,15 @@ export function ProvinceModal({ province, isUnlocked, userXP, onClose, onStartLe
             {province.key_phrase && (
               <div className="bg-orange-50 rounded-2xl p-4 border border-orange-100">
                 <p className="text-xs font-bold text-orange-400 uppercase mb-1">Local Phrase</p>
-                <p className="thai-text text-xl font-bold text-gray-900">{province.key_phrase}</p>
+                <div className="flex items-center gap-3">
+                  <p className="thai-text text-xl font-bold text-gray-900 flex-1">{province.key_phrase}</p>
+                  <button
+                    onClick={() => speakThai(province.key_phrase)}
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-orange-100 hover:bg-orange-200 text-orange-500 transition-colors flex-shrink-0"
+                  >
+                    <Volume2 size={16} />
+                  </button>
+                </div>
                 <p className="text-sm text-gray-500 mt-1">{province.key_phrase_translation}</p>
               </div>
             )}

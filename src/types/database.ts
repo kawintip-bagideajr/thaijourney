@@ -17,6 +17,7 @@ export interface Profile {
   username: string;
   display_name: string | null;
   avatar_url: string | null;
+  profile_bg?: string | null;
   bio: string | null;
   country: string | null;
   learning_goal: LearningGoal | null;

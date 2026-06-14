@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Volume2 } from "lucide-react";
 import { AudioPlayer } from "@/components/shared/AudioPlayer";
 import { ThaiText } from "@/components/shared/ThaiText";
 import { cn } from "@/lib/utils";
+import { speakThai } from "@/lib/speech";
 import type { MultipleChoiceOptions } from "@/types/lesson";
 
 interface MultipleChoiceProps {
@@ -41,7 +43,16 @@ export function MultipleChoice({
       <div className="flex flex-col items-center gap-4 py-6">
         {audioUrl && <AudioPlayer url={audioUrl} size="lg" />}
         {thaiText ? (
-          <ThaiText thai={thaiText} romanization={romanization} size="xl" />
+          <div className="flex items-center gap-3">
+            <ThaiText thai={thaiText} romanization={romanization} size="xl" />
+            <button
+              onClick={() => speakThai(thaiText)}
+              className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-100 hover:bg-orange-200 flex items-center justify-center text-orange-500 transition-colors"
+              title="Listen in Thai"
+            >
+              <Volume2 size={18} />
+            </button>
+          </div>
         ) : (
           <p className="text-2xl font-bold text-gray-900 text-center">{question}</p>
         )}
@@ -65,7 +76,7 @@ export function MultipleChoice({
               whileHover={!selected ? { scale: 1.02 } : {}}
               whileTap={!selected ? { scale: 0.98 } : {}}
               className={cn(
-                "relative p-4 rounded-2xl border-2 text-left font-medium text-sm transition-all duration-200",
+                "relative p-4 min-h-[64px] rounded-2xl border-2 text-left font-medium text-sm transition-all duration-200",
                 !showResult && "border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50",
                 showResult && isSelected && isCorrect && "border-green-400 bg-green-50 text-green-800",
                 showResult && isSelected && !isCorrect && "border-red-400 bg-red-50 text-red-800 animate-shake",

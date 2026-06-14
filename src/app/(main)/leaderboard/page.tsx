@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Flame, Zap } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
@@ -88,8 +89,14 @@ export default function LeaderboardPage() {
                     className="flex flex-col items-center gap-2"
                   >
                     <div className="text-2xl">{displayRank === 1 ? "👑" : ""}</div>
-                    <div className="w-12 h-12 gradient-thai rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg">
-                      {(leader.display_name ?? leader.username)[0].toUpperCase()}
+                    <div className="w-12 h-12 rounded-full overflow-hidden shadow-lg flex-shrink-0">
+                      {leader.avatar_url ? (
+                        <Image src={leader.avatar_url} alt={leader.display_name ?? leader.username} width={48} height={48} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full gradient-thai flex items-center justify-center text-white font-black text-lg">
+                          {(leader.display_name ?? leader.username)[0].toUpperCase()}
+                        </div>
+                      )}
                     </div>
                     <p className="text-xs font-bold text-gray-700 max-w-[80px] text-center truncate">
                       {leader.display_name ?? leader.username}
@@ -127,8 +134,14 @@ export default function LeaderboardPage() {
                 <span className={cn("text-lg font-black w-6 text-center", rankColors[leader.rank - 1] ?? "text-gray-400")}>
                   {leader.rank}
                 </span>
-                <div className="w-10 h-10 gradient-thai rounded-full flex items-center justify-center text-white font-bold shadow-sm">
-                  {(leader.display_name ?? leader.username)[0].toUpperCase()}
+                <div className="w-10 h-10 rounded-full overflow-hidden shadow-sm flex-shrink-0">
+                  {leader.avatar_url ? (
+                    <Image src={leader.avatar_url} alt={leader.display_name ?? leader.username} width={40} height={40} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full gradient-thai flex items-center justify-center text-white font-bold">
+                      {(leader.display_name ?? leader.username)[0].toUpperCase()}
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">

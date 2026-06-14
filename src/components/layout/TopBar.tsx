@@ -1,12 +1,15 @@
 "use client";
 import { Flame, Heart, Zap } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { xpProgressInLevel } from "@/lib/utils";
 import { ProgressBar } from "@/components/shared/ProgressBar";
 
 export function TopBar() {
+  const pathname = usePathname();
   const profile = useAuthStore((s) => s.profile);
-  if (!profile) return null;
+  // Hide during lessons — ExerciseWrapper has its own header
+  if (!profile || pathname.includes("/lesson/")) return null;
 
   const { current, needed, pct } = xpProgressInLevel(profile.total_xp);
 

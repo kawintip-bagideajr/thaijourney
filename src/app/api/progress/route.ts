@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const user = await getUserFromSession(cookieStore.get("__session")?.value);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { lessonSlug, moduleSlug, xpEarned, mistakes, timeMs } = await req.json();
+    const { lessonSlug, moduleSlug, xpEarned, mistakes, timeMs, heartSacrifice } = await req.json();
     const userId = user.uid;
 
     // Get current profile
@@ -18,6 +18,19 @@ export async function POST(req: NextRequest) {
     if (!profileDoc.exists) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
     const profile = profileDoc.data()!;
+
+    // Heart sacrifice: deduct 1 heart (only if user has hearts left)
+    const currentHearts = profile.hearts ?? 0;
+    if (heartSacrifice && currentHearts <= 0) {
+      return NextResponse.json({ error: "No hearts remaining" }, { status: 400 });
+    }
+    if (heartSacrifice) {
+      await adminDb.collection("users").doc(userId).update({
+        hearts: Math.max(0, currentHearts - 1),
+        updated_at: new Date().toISOString(),
+      });
+    }
+
     const newXP = (profile.total_xp ?? 0) + (xpEarned ?? 0);
     const newLevel = levelFromXP(newXP);
     const leveledUp = newLevel > (profile.level ?? 1);
@@ -86,7 +99,14 @@ export async function POST(req: NextRequest) {
       }, { merge: true });
     }
 
-    return NextResponse.json({ xpEarned, newXP, newLevel, leveledUp, newStreak });
+    return NextResponse.json({
+      xpEarned,
+      newXP,
+      newLevel,
+      leveledUp,
+      newStreak,
+      newHearts: heartSacrifice ? Math.max(0, currentHearts - 1) : currentHearts,
+    });
   } catch (error) {
     console.error("Progress API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

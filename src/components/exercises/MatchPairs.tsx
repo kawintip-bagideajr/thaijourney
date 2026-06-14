@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { speakThai } from "@/lib/speech";
 import type { MatchPairsOptions } from "@/types/lesson";
 
 interface MatchPairsProps {
@@ -15,10 +16,14 @@ export function MatchPairs({ options, onAnswer, disabled }: MatchPairsProps) {
   const [matched, setMatched] = useState<Record<string, boolean>>({});
   const [wrong, setWrong] = useState<string | null>(null);
 
-  const shuffledEnglish = [...options.pairs].sort(() => Math.random() - 0.5);
+  // useState lazy init runs once per mount — English column order never reshuffles
+  const [shuffledEnglish] = useState(() =>
+    [...options.pairs].sort(() => Math.random() - 0.5)
+  );
 
-  const handleThaiClick = (id: string) => {
+  const handleThaiClick = (id: string, thaiText: string) => {
     if (disabled || matched[id]) return;
+    speakThai(thaiText);
     setSelectedThai(id === selectedThai ? null : id);
     setWrong(null);
   };
@@ -41,17 +46,17 @@ export function MatchPairs({ options, onAnswer, disabled }: MatchPairsProps) {
   };
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-2 sm:gap-4">
       {/* Thai column */}
-      <div className="flex-1 flex flex-col gap-3">
+      <div className="flex-1 flex flex-col gap-2 sm:gap-3">
         <p className="text-xs font-bold text-gray-400 uppercase text-center mb-1">Thai</p>
         {options.pairs.map((pair) => (
           <motion.button
             key={pair.id}
-            onClick={() => handleThaiClick(pair.id)}
+            onClick={() => handleThaiClick(pair.id, pair.thai)}
             whileTap={{ scale: 0.97 }}
             className={cn(
-              "p-4 rounded-2xl border-2 thai-text text-center text-xl font-bold transition-all duration-150",
+              "p-3 sm:p-4 min-h-[56px] rounded-2xl border-2 thai-text text-center text-lg sm:text-xl font-bold transition-all duration-150",
               matched[pair.id] && "border-green-300 bg-green-50 text-green-700 opacity-60",
               selectedThai === pair.id && !matched[pair.id] && "border-orange-400 bg-orange-50 scale-105",
               !matched[pair.id] && selectedThai !== pair.id && "border-gray-200 bg-white hover:border-gray-300"
@@ -63,7 +68,7 @@ export function MatchPairs({ options, onAnswer, disabled }: MatchPairsProps) {
       </div>
 
       {/* English column */}
-      <div className="flex-1 flex flex-col gap-3">
+      <div className="flex-1 flex flex-col gap-2 sm:gap-3">
         <p className="text-xs font-bold text-gray-400 uppercase text-center mb-1">English</p>
         {shuffledEnglish.map((pair) => (
           <motion.button
@@ -71,7 +76,7 @@ export function MatchPairs({ options, onAnswer, disabled }: MatchPairsProps) {
             onClick={() => handleEnglishClick(pair.id)}
             whileTap={{ scale: 0.97 }}
             className={cn(
-              "p-4 rounded-2xl border-2 text-center text-sm font-semibold transition-all duration-150",
+              "p-3 sm:p-4 min-h-[56px] rounded-2xl border-2 text-center text-sm font-semibold transition-all duration-150",
               matched[pair.id] && "border-green-300 bg-green-50 text-green-700 opacity-60",
               wrong === pair.id && "border-red-400 bg-red-50 animate-shake",
               !matched[pair.id] && wrong !== pair.id && "border-gray-200 bg-white hover:border-gray-300"

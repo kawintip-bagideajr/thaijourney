@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CONSONANTS, VOWELS, TONE_MARKS, type ConsonantClass } from "@/data/alphabet";
+import { CONSONANTS, VOWELS, TONE_MARKS, type ConsonantClass, type ThaiConsonant } from "@/data/alphabet";
 import { ConsonantCard } from "@/components/alphabet/ConsonantCard";
+import { ConsonantDetailModal } from "@/components/alphabet/ConsonantDetailModal";
 import { ToneChart } from "@/components/alphabet/ToneChart";
-import { ThaiText } from "@/components/shared/ThaiText";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { speakThai } from "@/lib/speech";
 
 const CLASS_COLORS: Record<ConsonantClass, { bg: string; text: string; badge: string }> = {
   high: { bg: "bg-blue-50", text: "text-blue-700", badge: "bg-blue-100 text-blue-700" },
@@ -17,6 +17,7 @@ const CLASS_COLORS: Record<ConsonantClass, { bg: string; text: string; badge: st
 export default function AlphabetPage() {
   const [activeTab, setActiveTab] = useState<"consonants" | "vowels" | "tones">("consonants");
   const [filterClass, setFilterClass] = useState<ConsonantClass | "all">("all");
+  const [selectedConsonant, setSelectedConsonant] = useState<ThaiConsonant | null>(null);
 
   const filteredConsonants = filterClass === "all"
     ? CONSONANTS
@@ -30,6 +31,7 @@ export default function AlphabetPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      <ConsonantDetailModal consonant={selectedConsonant} onClose={() => setSelectedConsonant(null)} />
       <div>
         <h1 className="text-2xl font-black text-gray-900">Thai Alphabet</h1>
         <p className="text-gray-500 text-sm mt-1">Master the building blocks of the Thai language</p>
@@ -92,7 +94,7 @@ export default function AlphabetPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.02 }}
               >
-                <ConsonantCard consonant={consonant} />
+                <ConsonantCard consonant={consonant} onSelect={setSelectedConsonant} />
               </motion.div>
             ))}
           </div>
@@ -111,12 +113,16 @@ export default function AlphabetPage() {
                 transition={{ delay: i * 0.03 }}
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4"
               >
-                <div className={cn(
-                  "w-16 h-16 rounded-2xl flex items-center justify-center thai-text text-3xl font-bold",
-                  vowel.length === "long" ? "bg-purple-50 text-purple-800" : "bg-teal-50 text-teal-800"
-                )}>
+                <button
+                  onClick={() => speakThai(vowel.thai.replace("_", ""))}
+                  className={cn(
+                    "w-16 h-16 rounded-2xl flex items-center justify-center thai-text text-3xl font-bold flex-shrink-0 hover:opacity-80 transition-opacity active:scale-95",
+                    vowel.length === "long" ? "bg-purple-50 text-purple-800" : "bg-teal-50 text-teal-800"
+                  )}
+                  title="Tap to hear"
+                >
                   {vowel.thai}
-                </div>
+                </button>
                 <div className="flex-1">
                   <p className="font-bold text-gray-900">{vowel.rtgs}</p>
                   <p className="text-sm text-gray-500">{vowel.ipa}</p>

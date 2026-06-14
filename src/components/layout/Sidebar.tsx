@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard, BookOpen, Map, Trophy, MessageCircle,
-  Star, User, Settings, LogOut, Flame,
+  Star, User, Settings, LogOut, Flame, BookMarked,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { href: "/alphabet", icon: Star, label: "Alphabet" },
   { href: "/map", icon: Map, label: "Adventure Map" },
   { href: "/leaderboard", icon: Trophy, label: "Leaderboard" },
+  { href: "/dictionary", icon: BookMarked, label: "Dictionary" },
   { href: "/chat", icon: MessageCircle, label: "AI Chat" },
   { href: "/achievements", icon: Star, label: "Achievements" },
   { href: "/profile", icon: User, label: "Profile" },

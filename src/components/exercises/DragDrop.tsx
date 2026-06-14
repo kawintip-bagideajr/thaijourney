@@ -72,7 +72,7 @@ export function DragDrop({ question, options, correctAnswer, onAnswer, disabled 
             onClick={() => addWord(word)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-4 py-2.5 bg-white border-2 border-gray-200 hover:border-orange-300 text-gray-800 rounded-xl text-sm font-bold thai-text shadow-sm transition-all"
+            className="px-4 py-3 bg-white border-2 border-gray-200 hover:border-orange-300 text-gray-800 rounded-xl text-sm font-bold thai-text shadow-sm transition-all"
           >
             {word}
           </motion.button>

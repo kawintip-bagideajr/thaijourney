@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, X, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,13 +39,16 @@ export function ExerciseWrapper({
       {/* Header */}
       <div className="sticky top-0 bg-white border-b border-gray-100 z-10 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center gap-4">
-          <button onClick={onQuit} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X size={24} />
+          <button
+            onClick={onQuit}
+            className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-xl hover:bg-gray-100 flex-shrink-0"
+          >
+            <X size={22} />
           </button>
           <div className="flex-1">
             <ProgressBar value={progress} animated />
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {Array.from({ length: 5 }).map((_, i) => (
               <Heart
                 key={i}
@@ -61,10 +63,10 @@ export function ExerciseWrapper({
         </div>
       </div>
 
-      {/* Exercise content */}
-      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-4 py-8">
+      {/* Exercise content — bottom padding leaves room for the fixed feedback panel */}
+      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-4 pt-6 pb-56 sm:pb-36">
         {exercise?.instruction && (
-          <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-6">
+          <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-5">
             {exercise.instruction}
           </p>
         )}
@@ -91,25 +93,26 @@ export function ExerciseWrapper({
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={cn(
-              "fixed bottom-0 left-0 right-0 px-4 py-6 border-t-2",
+              "fixed bottom-0 left-0 right-0 z-50 px-4 pt-4 border-t-2",
+              "pb-[calc(1rem+env(safe-area-inset-bottom,0px))]",
               isCorrect
                 ? "bg-green-50 border-green-200"
                 : "bg-red-50 border-red-200"
             )}
           >
-            <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+            <div className="max-w-2xl mx-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
                 {isCorrect ? (
-                  <CheckCircle2 size={28} className="text-green-500" />
+                  <CheckCircle2 size={28} className="text-green-500 flex-shrink-0 mt-0.5" />
                 ) : (
-                  <XCircle size={28} className="text-red-500" />
+                  <XCircle size={28} className="text-red-500 flex-shrink-0 mt-0.5" />
                 )}
-                <div>
-                  <p className={cn("font-bold text-lg", isCorrect ? "text-green-700" : "text-red-700")}>
+                <div className="min-w-0">
+                  <p className={cn("font-bold text-lg leading-tight", isCorrect ? "text-green-700" : "text-red-700")}>
                     {isCorrect ? "Correct!" : "Incorrect"}
                   </p>
                   {!isCorrect && exercise?.explanation && (
-                    <p className="text-sm text-red-600">{exercise.explanation}</p>
+                    <p className="text-sm text-red-600 mt-0.5 break-words">{exercise.explanation}</p>
                   )}
                 </div>
               </div>
@@ -117,7 +120,7 @@ export function ExerciseWrapper({
                 onClick={onNext}
                 variant={isCorrect ? "success" : "destructive"}
                 size="lg"
-                className="min-w-[120px]"
+                className="w-full sm:w-auto sm:min-w-[140px] flex-shrink-0"
               >
                 Continue
               </Button>

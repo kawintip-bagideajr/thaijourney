@@ -42,16 +42,39 @@ export function useAuth() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const p = await fetchOrCreateProfile(user.uid, user.email);
-        if (p) setProfile(p);
-        else setLoading(false);
-      } else {
+    let unsubscribe: (() => void) | undefined;
+
+    const init = async () => {
+      // Wait for Firebase to finish loading persisted auth state before
+      // subscribing, so the first onAuthStateChanged event is authoritative.
+      // If it rejects (expired/corrupt IndexedDB token), fall through and
+      // subscribe anyway — worst case is one spurious null event then sign-out.
+      try {
+        await auth.authStateReady();
+      } catch {
+        // Firebase Auth initialization failed (stale persisted token).
+        // clearAuth so the UI stops loading instead of hanging forever.
         clearAuth();
+        return;
       }
-    });
-    return () => unsubscribe();
+
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          try {
+            const p = await fetchOrCreateProfile(user.uid, user.email);
+            if (p) setProfile(p);
+            else setLoading(false);
+          } catch {
+            setLoading(false);
+          }
+        } else {
+          clearAuth();
+        }
+      });
+    };
+
+    init();
+    return () => { unsubscribe?.(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

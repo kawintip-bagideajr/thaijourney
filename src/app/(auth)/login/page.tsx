@@ -46,17 +46,29 @@ export default function LoginPage() {
     setError("");
     if (DEMO_MODE) { router.push("/dashboard"); return; }
     try {
-      const credential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const credential = await signInWithEmailAndPassword(auth, data.email.trim(), data.password);
       const idToken = await credential.user.getIdToken();
       await createSession(idToken);
       router.push("/dashboard");
     } catch (e: unknown) {
       const code = (e as { code?: string }).code ?? "";
-      const msg = (e as { message?: string }).message ?? "";
-      if (code.includes("user-not-found") || code.includes("wrong-password") || code.includes("invalid-credential")) {
-        setError("Invalid email or password");
+      if (
+        code.includes("user-not-found") ||
+        code.includes("wrong-password") ||
+        code.includes("invalid-credential") ||
+        code.includes("invalid-login-credentials")
+      ) {
+        setError("Incorrect email or password. If you signed up with Google, tap 'Continue with Google' above.");
+      } else if (code.includes("invalid-email")) {
+        setError("Please enter a valid email address.");
+      } else if (code.includes("too-many-requests")) {
+        setError("Too many failed attempts. Wait a few minutes and try again, or reset your password.");
+      } else if (code.includes("user-disabled")) {
+        setError("This account has been disabled.");
+      } else if (code.includes("operation-not-allowed")) {
+        setError("Email sign-in is not enabled. Please use 'Continue with Google'.");
       } else {
-        setError(msg || "Sign in failed. Please try again.");
+        setError("Sign in failed. Please try again.");
       }
     }
   };
@@ -94,7 +106,7 @@ export default function LoginPage() {
       <button
         type="button"
         onClick={handleGoogleLogin}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-semibold text-gray-700"
+        className="w-full flex items-center justify-center gap-3 px-4 py-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-semibold text-gray-700"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -151,6 +163,9 @@ export default function LoginPage() {
         <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Sign In"}
         </Button>
+        <p className="text-center text-xs text-gray-400">
+          Signed up with Google? Use <span className="font-semibold">Continue with Google</span> above
+        </p>
       </form>
 
       <p className="text-center text-sm text-gray-500">

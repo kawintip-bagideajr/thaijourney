@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { TopBar } from "@/components/layout/TopBar";
@@ -32,8 +32,29 @@ const DEMO_PROFILE = {
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const { profile, isLoading } = useAuth();
+  const clearAuth = useAuthStore((s) => s.clearAuth);
   const setProfile = useAuthStore((s) => s.setProfile);
   const router = useRouter();
+  const pathname = usePathname();
+  const isLesson = pathname.includes("/lesson/");
+
+  // Safety net: if Firebase Auth never resolves within 8s, force full sign-out + redirect
+  useEffect(() => {
+    if (!FIREBASE_CONFIGURED || !isLoading) return;
+    const t = setTimeout(async () => {
+      try {
+        const { signOut } = await import("firebase/auth");
+        const { auth } = await import("@/lib/firebase/client");
+        await signOut(auth);
+      } catch {}
+      try {
+        await fetch("/api/auth/logout", { method: "POST" });
+      } catch {}
+      clearAuth();
+      router.push("/login");
+    }, 8000);
+    return () => clearTimeout(t);
+  }, [isLoading, clearAuth, router]);
 
   useEffect(() => {
     if (!FIREBASE_CONFIGURED) {
@@ -49,14 +70,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   if (!FIREBASE_CONFIGURED && !displayProfile) return <PageLoader />;
   if (FIREBASE_CONFIGURED && isLoading) return <PageLoader />;
-  if (FIREBASE_CONFIGURED && !profile) return null;
+  if (FIREBASE_CONFIGURED && !profile) return <PageLoader />;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 lg:ml-64 flex flex-col">
         <TopBar />
-        <main className="flex-1 pb-20 lg:pb-6">
+        <main className={isLesson ? "flex-1" : "flex-1 pb-20 lg:pb-6"}>
           {children}
         </main>
       </div>
