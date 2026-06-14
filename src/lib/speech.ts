@@ -32,7 +32,7 @@ export function speakThai(text: string): void {
     currentAudio = null;
   }
 
-  const audio = new Audio(`/api/tts?t=${encodeURIComponent(text)}`);
+  const audio = new Audio(`/api/tts?v=2&t=${encodeURIComponent(text)}`);
   currentAudio = audio;
 
   // Both network error and HTTP error (e.g. 503) trigger the fallback
