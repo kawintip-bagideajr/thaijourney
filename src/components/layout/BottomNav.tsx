@@ -1,14 +1,14 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BookOpen, Map, BookMarked, User } from "lucide-react";
+import { LayoutDashboard, BookOpen, Map, MessageCircle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const MOBILE_NAV = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
   { href: "/learn", icon: BookOpen, label: "Learn" },
   { href: "/map", icon: Map, label: "Map" },
-  { href: "/dictionary", icon: BookMarked, label: "Dict" },
+  { href: "/chat", icon: MessageCircle, label: "AI Chat" },
   { href: "/profile", icon: User, label: "Profile" },
 ];
 
