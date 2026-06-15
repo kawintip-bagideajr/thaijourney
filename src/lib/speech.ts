@@ -1,4 +1,5 @@
 let currentAudio: HTMLAudioElement | null = null;
+let currentGeneration = 0;
 
 function speakViaSynthesis(text: string) {
   if (!("speechSynthesis" in window)) return;
@@ -15,7 +16,6 @@ function speakViaSynthesis(text: string) {
     window.speechSynthesis.speak(utterance);
   };
 
-  // getVoices() populates asynchronously on first load
   if (window.speechSynthesis.getVoices().length > 0) {
     doSpeak();
   } else {
@@ -33,12 +33,17 @@ export function speakThai(text: string): void {
   }
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
+  // Increment generation so stale callbacks from previous calls are ignored.
+  // Setting src="" above can fire an "error" event on the old element — without
+  // this guard, that would trigger speakViaSynthesis with the wrong (old) text.
+  const generation = ++currentGeneration;
+
   const audio = new Audio(`/api/tts?v=2&t=${encodeURIComponent(text)}`);
   currentAudio = audio;
 
   let didFallback = false;
   const fallback = () => {
-    if (didFallback) return;
+    if (didFallback || generation !== currentGeneration) return;
     didFallback = true;
     currentAudio = null;
     speakViaSynthesis(text);
