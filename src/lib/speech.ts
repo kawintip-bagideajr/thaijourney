@@ -31,11 +31,19 @@ export function speakThai(text: string): void {
     currentAudio.src = "";
     currentAudio = null;
   }
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
   const audio = new Audio(`/api/tts?v=2&t=${encodeURIComponent(text)}`);
   currentAudio = audio;
 
-  // Both network error and HTTP error (e.g. 503) trigger the fallback
-  audio.addEventListener("error", () => speakViaSynthesis(text), { once: true });
-  audio.play().catch(() => speakViaSynthesis(text));
+  let didFallback = false;
+  const fallback = () => {
+    if (didFallback) return;
+    didFallback = true;
+    currentAudio = null;
+    speakViaSynthesis(text);
+  };
+
+  audio.addEventListener("error", fallback, { once: true });
+  audio.play().catch(fallback);
 }
