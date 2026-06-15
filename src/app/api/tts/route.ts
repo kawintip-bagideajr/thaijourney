@@ -9,11 +9,23 @@ export async function GET(req: NextRequest) {
 
   const q = encodeURIComponent(text);
   const len = text.length;
+  // UTF-8 byte length — client=at expects bytes, not character count
+  const byteLen = new TextEncoder().encode(text).byteLength;
 
-  // Three attempts in order of quality — 'at' (Android client) has the best Thai tone accuracy
   const attempts: { url: string; headers: Record<string, string> }[] = [
+    // translate.googleapis.com/client=te — the endpoint Google Translate web uses
+    // for playback; separate TTS pipeline with better Thai tone-mark handling
     {
-      url: `https://translate.google.com/translate_tts?ie=UTF-8&q=${q}&tl=th&client=at&ttsspeed=0.85&total=1&idx=0&textlen=${len}`,
+      url: `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${q}&tl=th&client=te&ttsspeed=0.85&total=1&idx=0&textlen=${len}`,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Referer: "https://translate.google.com/",
+        Accept: "audio/mpeg,audio/*;q=0.9,*/*;q=0.8",
+      },
+    },
+    // Android client with byte-length — most faithful to actual Android app behaviour
+    {
+      url: `https://translate.google.com/translate_tts?ie=UTF-8&q=${q}&tl=th&client=at&ttsspeed=0.85&total=1&idx=0&textlen=${byteLen}`,
       headers: {
         "User-Agent": "GoogleTranslate/6.37.0 (Linux; Android 13; Build/TQ3A.230901.001)",
         Accept: "audio/mpeg,audio/*;q=0.9",

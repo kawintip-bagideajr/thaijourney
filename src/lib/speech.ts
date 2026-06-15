@@ -38,7 +38,7 @@ export function speakThai(text: string): void {
   // this guard, that would trigger speakViaSynthesis with the wrong (old) text.
   const generation = ++currentGeneration;
 
-  const audio = new Audio(`/api/tts?v=2&t=${encodeURIComponent(text)}`);
+  const audio = new Audio(`/api/tts?v=3&t=${encodeURIComponent(text)}`);
   currentAudio = audio;
 
   let didFallback = false;
