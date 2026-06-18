@@ -74,31 +74,31 @@ export default function DashboardPage() {
   const timeDisplay = hoursStudied > 0 ? `${hoursStudied}h${minsRemainder > 0 ? ` ${minsRemainder}m` : ""}` : `${totalMinutes}m`;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 py-5 space-y-5">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
       >
         <div>
-          <h1 className="text-2xl font-black text-gray-900">
+          <h1 className="text-xl font-black text-gray-900 sm:text-2xl">
             สวัสดี, {profile.display_name ?? profile.username}! 👋
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">
+          <p className="text-gray-500 text-xs mt-0.5 sm:text-sm">
             {profile.current_streak > 0
-              ? `You're on a ${profile.current_streak}-day streak! Keep it going.`
+              ? `🔥 ${profile.current_streak}-day streak! Keep it going.`
               : "Start a lesson to begin your streak!"}
           </p>
         </div>
-        <Link href="/learn">
-          <Button size="lg" className="gap-2 shadow-md">
-            <BookOpen size={18} />
+        <Link href="/learn" className="shrink-0">
+          <Button size="default" className="gap-2 shadow-md text-sm">
+            <BookOpen size={16} />
             Continue Learning
           </Button>
         </Link>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -140,7 +140,7 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatsCard label="Total XP" value={formatNumber(profile.total_xp)} icon={Zap} color="orange" />
         <StatsCard label="Best Streak" value={`${profile.longest_streak}d`} icon={Flame} color="red" />
         <StatsCard label="Time Studied" value={totalMinutes > 0 ? timeDisplay : "0m"} icon={Clock} color="blue" />
@@ -161,7 +161,7 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-3 gap-3"
       >
         <Link href="/alphabet" className="group bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-5 border border-blue-100 hover:shadow-md transition-all">
           <div className="text-3xl mb-3">🔤</div>

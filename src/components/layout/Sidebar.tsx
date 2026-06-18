@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
+import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -31,9 +32,7 @@ export function Sidebar() {
     <aside className="hidden lg:flex flex-col w-64 min-h-screen bg-white border-r border-gray-100 px-4 py-6 gap-2 fixed left-0 top-0 z-40">
       {/* Logo */}
       <Link href="/dashboard" className="flex items-center gap-3 px-2 mb-6">
-        <div className="w-10 h-10 gradient-thai rounded-xl flex items-center justify-center text-xl shadow-md">
-          🇹🇭
-        </div>
+        <AppLogoIcon size={40} />
         <div>
           <span className="text-xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
             ThaiJourney

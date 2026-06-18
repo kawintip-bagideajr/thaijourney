@@ -1,14 +1,27 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { AchievementPopup } from "@/components/gamification/AchievementPopup";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "ThaiJourney — Learn Thai Through Adventure",
   description: "The gamified Thai language learning platform. Unlock Thailand's 77 provinces as you master the language.",
   keywords: ["learn Thai", "Thai language", "Thai lessons", "Thai alphabet"],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,5 +1,10 @@
 import type { ActiveExercise } from "@/types/lesson";
 import { GREETINGS_EXERCISES } from "./greetings";
+import { FAMILY_VOCAB, FAMILY_RELATIONSHIPS, FAMILY_CONVERSATION } from "./family";
+import { TIME_VOCAB, DAYS_MONTHS, TIME_PHRASES } from "./time";
+import { WEATHER_VOCAB, THAI_SEASONS } from "./weather";
+import { THAI_CUSTOMS, THAI_FESTIVALS } from "./culture";
+import { WORK_VOCAB, OFFICE_PHRASES } from "./work";
 
 const NUMBERS_1_10: ActiveExercise[] = [
   {
@@ -625,6 +630,28 @@ const LESSON_MAP: Record<string, ActiveExercise[]> = {
   // Emergency module
   "emergency/emergency-phrases": EMERGENCY_PHRASES,
   "emergency/hospital": HOSPITAL,
+
+  // Family module
+  "family/family-vocab": FAMILY_VOCAB,
+  "family/relationships": FAMILY_RELATIONSHIPS,
+  "family/family-conversation": FAMILY_CONVERSATION,
+
+  // Time & Date module
+  "time/time-vocab": TIME_VOCAB,
+  "time/days-months": DAYS_MONTHS,
+  "time/time-phrases": TIME_PHRASES,
+
+  // Weather module
+  "weather/weather-vocab": WEATHER_VOCAB,
+  "weather/seasons": THAI_SEASONS,
+
+  // Culture module
+  "culture/customs": THAI_CUSTOMS,
+  "culture/festivals": THAI_FESTIVALS,
+
+  // Work module
+  "work/work-vocab": WORK_VOCAB,
+  "work/office-phrases": OFFICE_PHRASES,
 };
 
 export function getLessonExercises(moduleId: string, lessonId: string): ActiveExercise[] {

@@ -12,6 +12,7 @@ import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleA
 import { doc, setDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
 
 const DEMO_MODE = !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
@@ -122,7 +123,7 @@ export default function SignupPage() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="text-center lg:text-left">
         <Link href="/" className="inline-flex items-center gap-2 mb-6 lg:hidden">
-          <div className="w-8 h-8 gradient-thai rounded-xl flex items-center justify-center">🇹🇭</div>
+          <AppLogoIcon size={32} />
           <span className="font-black text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">ThaiJourney</span>
         </Link>
         <h1 className="text-3xl font-black text-gray-900">Start your journey</h1>
@@ -189,7 +190,7 @@ export default function SignupPage() {
         )}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Create Free Account 🇹🇭"}
+          {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Create Free Account ✨"}
         </Button>
       </form>
 

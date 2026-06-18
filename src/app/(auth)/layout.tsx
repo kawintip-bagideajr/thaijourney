@@ -1,3 +1,5 @@
+import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
+
 export const dynamic = "force-dynamic";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -6,7 +8,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Left: decorative panel (desktop only) */}
       <div className="hidden lg:flex lg:w-1/2 gradient-thai flex-col items-center justify-center p-12 text-white">
         <div className="max-w-md text-center">
-          <div className="text-8xl mb-6 animate-float">🇹🇭</div>
+          <div className="flex justify-center mb-6 animate-float">
+            <AppLogoIcon size={96} />
+          </div>
           <h1 className="text-4xl font-black mb-4">ThaiJourney</h1>
           <p className="text-xl opacity-90 mb-8">
             Unlock Thailand through language.<br />

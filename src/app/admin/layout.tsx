@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { LayoutDashboard, Users, BookOpen, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, BarChart3 } from "lucide-react";
+import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
 
 const ADMIN_NAV = [
   { href: "/admin", icon: LayoutDashboard, label: "Overview" },
@@ -14,7 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className="w-60 bg-gray-900 border-r border-gray-800 flex flex-col px-4 py-6">
         <Link href="/admin" className="flex items-center gap-2.5 px-2 mb-8">
-          <div className="w-8 h-8 gradient-thai rounded-lg flex items-center justify-center text-sm">🇹🇭</div>
+          <AppLogoIcon size={32} />
           <div>
             <p className="text-sm font-black text-white">ThaiJourney</p>
             <p className="text-[10px] text-gray-400">Admin Panel</p>

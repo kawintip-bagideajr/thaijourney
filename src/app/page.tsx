@@ -3,6 +3,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, Map, Zap, MessageCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
 
 const FEATURES = [
   { icon: "🗺️", title: "Adventure Map", desc: "Unlock Thailand's 77 provinces as you learn" },
@@ -33,9 +34,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur border-b border-gray-100 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 gradient-thai rounded-xl flex items-center justify-center text-lg shadow-sm">
-              🇹🇭
-            </div>
+            <AppLogoIcon size={36} />
             <span className="text-xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
               ThaiJourney
             </span>
@@ -66,7 +65,7 @@ export default function LandingPage() {
             <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-6">
               Learn Thai Through
               <span className="block bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent">
-                Adventure 🇹🇭
+                Adventure ✨
               </span>
             </h1>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">

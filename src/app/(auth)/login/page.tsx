@@ -11,6 +11,7 @@ import { auth } from "@/lib/firebase/client";
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
 
 const DEMO_MODE = !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
@@ -94,7 +95,7 @@ export default function LoginPage() {
     >
       <div className="text-center lg:text-left">
         <Link href="/" className="inline-flex items-center gap-2 mb-6 lg:hidden">
-          <div className="w-8 h-8 gradient-thai rounded-xl flex items-center justify-center">🇹🇭</div>
+          <AppLogoIcon size={32} />
           <span className="font-black text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
             ThaiJourney
           </span>

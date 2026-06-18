@@ -26,6 +26,9 @@ function speakViaSynthesis(text: string) {
 export function speakThai(text: string): void {
   if (typeof window === "undefined") return;
 
+  // Strip romanization in parentheses, e.g. "พ่อ (pho)" → "พ่อ"
+  const thaiOnly = text.replace(/\s*\([^)]*\)\s*/g, "").trim();
+
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
@@ -38,7 +41,7 @@ export function speakThai(text: string): void {
   // this guard, that would trigger speakViaSynthesis with the wrong (old) text.
   const generation = ++currentGeneration;
 
-  const audio = new Audio(`/api/tts?v=3&t=${encodeURIComponent(text)}`);
+  const audio = new Audio(`/api/tts?v=3&t=${encodeURIComponent(thaiOnly)}`);
   currentAudio = audio;
 
   let didFallback = false;
@@ -46,7 +49,7 @@ export function speakThai(text: string): void {
     if (didFallback || generation !== currentGeneration) return;
     didFallback = true;
     currentAudio = null;
-    speakViaSynthesis(text);
+    speakViaSynthesis(thaiOnly);
   };
 
   audio.addEventListener("error", fallback, { once: true });
