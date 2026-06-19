@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type AppTheme = "light" | "sakura" | "ocean" | "dark";
+export type AppTheme = "light" | "sakura" | "ocean" | "forest" | "dark";
 export type AppLanguage = "en" | "th" | "ja" | "zh" | "ko" | "fr";
 
 interface SettingsState {

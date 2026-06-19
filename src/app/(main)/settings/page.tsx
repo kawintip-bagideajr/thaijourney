@@ -37,6 +37,11 @@ const THEMES: {
     dot: "bg-cyan-400", text: "text-gray-900",
   },
   {
+    id: "forest", label: "Forest", desc: "Lush emerald green",
+    bg: "bg-green-50", card: "bg-white", pill: "bg-green-500",
+    dot: "bg-emerald-400", text: "text-gray-900",
+  },
+  {
     id: "dark", label: "Night", desc: "Easy on your eyes",
     bg: "bg-slate-900", card: "bg-slate-800", pill: "bg-orange-500",
     dot: "bg-slate-600", text: "text-slate-100",
@@ -63,7 +68,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove("theme-light", "theme-sakura", "theme-ocean", "theme-dark");
+    root.classList.remove("theme-light", "theme-sakura", "theme-ocean", "theme-forest", "theme-dark");
     if (theme !== "light") root.classList.add(`theme-${theme}`);
   }, [theme]);
 

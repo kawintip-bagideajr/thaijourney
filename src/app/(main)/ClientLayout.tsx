@@ -43,7 +43,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove("theme-sakura", "theme-ocean", "theme-dark");
+    root.classList.remove("theme-sakura", "theme-ocean", "theme-forest", "theme-dark");
     if (theme !== "light") root.classList.add(`theme-${theme}`);
   }, [theme]);
 
