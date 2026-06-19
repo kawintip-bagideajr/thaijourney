@@ -80,10 +80,10 @@ export function Sidebar() {
 
       {/* Bottom */}
       <div className="border-t pt-4 flex flex-col gap-1">
-        <Link href="/pricing">
+        <Link href="/subscribe">
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
             <Crown size={18} className="text-amber-400" />
-            Upgrade to Pro
+            Go Pro — $5/mo
           </div>
         </Link>
         <Link href="/donate">

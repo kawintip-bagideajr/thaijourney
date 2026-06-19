@@ -25,7 +25,7 @@ const MORE_NAV = [
   { href: "/alphabet", icon: Star, label: "Alphabet" },
   { href: "/achievements", icon: Flame, label: "Badges" },
   { href: "/profile", icon: User, label: "Profile" },
-  { href: "/pricing", icon: Crown, label: "Pro" },
+  { href: "/subscribe", icon: Crown, label: "Pro" },
   { href: "/donate", icon: Heart, label: "Donate" },
   { href: "/settings", icon: Settings, label: "Settings" },
 ];

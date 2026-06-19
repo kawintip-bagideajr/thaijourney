@@ -96,7 +96,7 @@ export default function SettingsPage() {
             </p>
           </div>
           {!isPro && (
-            <Link href="/pricing">
+            <Link href="/subscribe">
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 className="gradient-thai text-white text-xs font-bold px-4 py-2 rounded-xl"

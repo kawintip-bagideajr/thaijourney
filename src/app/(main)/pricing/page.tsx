@@ -1,8 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
-import { Check, X, Crown, Zap, MessageCircle, BookMarked, Bot, Lock } from "lucide-react";
+import { Check, X, Crown, Bot, BookMarked, MessageCircle, Lock, Zap } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 
@@ -23,12 +22,10 @@ const PRO_FEATURES = [
   { label: "AI Grammar Checker for Thai sentences", ok: true },
   { label: "Smart AI Dictionary with examples", ok: true },
   { label: "Priority support", ok: true },
-  { label: "Support the project ❤️", ok: true },
 ];
 
 export default function PricingPage() {
   const profile = useAuthStore((s) => s.profile);
-  const router = useRouter();
   const isPro = profile?.access_tier === "pro";
 
   return (
@@ -43,8 +40,8 @@ export default function PricingPage() {
         >
           <Crown size={28} className="text-white" />
         </motion.div>
-        <h1 className="text-2xl font-black text-gray-900">Upgrade to Pro</h1>
-        <p className="text-gray-500 text-sm mt-1">Unlock AI-powered Thai learning</p>
+        <h1 className="text-2xl font-black text-gray-900">Choose Your Plan</h1>
+        <p className="text-gray-500 text-sm mt-1">Free forever or unlock AI features with Pro</p>
       </div>
 
       {/* Tier cards */}
@@ -55,15 +52,18 @@ export default function PricingPage() {
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             "bg-white rounded-2xl border p-5",
-            !isPro ? "border-gray-200" : "border-gray-100 opacity-70"
+            !isPro ? "border-gray-200" : "border-gray-100 opacity-60"
           )}
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-black text-gray-900">Free Access</h2>
+              <h2 className="text-lg font-black text-gray-900">Free</h2>
               <p className="text-xs text-gray-400">No cost, always available</p>
             </div>
-            <span className="text-2xl font-black text-gray-300">฿0</span>
+            <div className="text-right">
+              <span className="text-2xl font-black text-gray-400">$0</span>
+              <p className="text-[10px] text-gray-400">forever</p>
+            </div>
           </div>
           <div className="space-y-2">
             {FREE_FEATURES.map((f, i) => (
@@ -93,17 +93,20 @@ export default function PricingPage() {
         >
           <div className="absolute top-3 right-3">
             <span className="gradient-thai text-white text-[10px] font-black px-2 py-1 rounded-full">
-              RECOMMENDED
+              PRO
             </span>
           </div>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-lg font-black text-gray-900">Pro Access</h2>
-              <p className="text-xs text-gray-400">Full AI features included</p>
+              <h2 className="text-lg font-black text-gray-900">Pro</h2>
+              <p className="text-xs text-gray-400">Full AI features</p>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-black text-orange-500">฿100</span>
-              <p className="text-[10px] text-gray-400">one-time donation</p>
+              <div className="flex items-baseline gap-0.5 justify-end">
+                <span className="text-xl font-black text-orange-500">$5</span>
+                <span className="text-sm text-gray-400 font-medium">/ month</span>
+              </div>
+              <p className="text-[10px] text-gray-400">≈ ฿175 / month</p>
             </div>
           </div>
           <div className="space-y-2 mb-5">
@@ -119,12 +122,13 @@ export default function PricingPage() {
               ⭐ You have Pro Access!
             </div>
           ) : (
-            <Link href="/donate">
+            <Link href="/subscribe">
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                className="w-full gradient-thai text-white font-black py-3.5 rounded-2xl text-sm"
+                className="w-full gradient-thai text-white font-black py-3.5 rounded-2xl text-sm flex items-center justify-center gap-2"
               >
-                Donate & Get Pro Access →
+                <Zap size={16} />
+                Subscribe to Pro — $5/month
               </motion.button>
             </Link>
           )}
@@ -159,8 +163,7 @@ export default function PricingPage() {
       </div>
 
       <p className="text-center text-xs text-gray-400 px-4">
-        Pro access is activated immediately after donation confirmation.
-        No subscription — it&apos;s yours forever. 🙏
+        Cancel anytime. Pro activates within minutes of payment confirmation.
       </p>
     </div>
   );

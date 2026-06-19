@@ -33,8 +33,8 @@ function ProGate() {
           See Pro Plans
         </motion.button>
       </Link>
-      <Link href="/donate" className="text-sm text-orange-500 font-semibold underline underline-offset-2">
-        Support ThaiJN & Get Pro →
+      <Link href="/subscribe" className="text-sm text-orange-500 font-semibold underline underline-offset-2">
+        Subscribe to Pro — $5/month →
       </Link>
     </motion.div>
   );
