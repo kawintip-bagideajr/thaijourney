@@ -4,18 +4,43 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Volume2, VolumeX, Palette, Globe, Crown, Heart,
-  Bell, Moon, ChevronRight, Check,
+  Bell, ChevronRight, Check,
 } from "lucide-react";
 import Link from "next/link";
 import { useSettingsStore, type AppTheme, type AppLanguage } from "@/store/settingsStore";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 
-const THEMES: { id: AppTheme; label: string; emoji: string; desc: string }[] = [
-  { id: "light", label: "Classic Orange", emoji: "🟠", desc: "Default warm Thai style" },
-  { id: "sakura", label: "Sakura Pink", emoji: "🌸", desc: "Soft cherry blossom feel" },
-  { id: "ocean", label: "Ocean Blue", emoji: "🌊", desc: "Cool Andaman vibes" },
-  { id: "dark", label: "Night Mode", emoji: "🌙", desc: "Easy on the eyes" },
+const THEMES: {
+  id: AppTheme;
+  label: string;
+  desc: string;
+  bg: string;
+  card: string;
+  pill: string;
+  dot: string;
+  text: string;
+}[] = [
+  {
+    id: "light", label: "Classic", desc: "Warm Thai orange",
+    bg: "bg-orange-50", card: "bg-white", pill: "bg-orange-500",
+    dot: "bg-amber-400", text: "text-gray-900",
+  },
+  {
+    id: "sakura", label: "Sakura", desc: "Cherry blossom pink",
+    bg: "bg-pink-50", card: "bg-white", pill: "bg-pink-500",
+    dot: "bg-rose-400", text: "text-gray-900",
+  },
+  {
+    id: "ocean", label: "Ocean", desc: "Calm Andaman blue",
+    bg: "bg-sky-50", card: "bg-white", pill: "bg-sky-600",
+    dot: "bg-cyan-400", text: "text-gray-900",
+  },
+  {
+    id: "dark", label: "Night", desc: "Easy on your eyes",
+    bg: "bg-slate-900", card: "bg-slate-800", pill: "bg-orange-500",
+    dot: "bg-slate-600", text: "text-slate-100",
+  },
 ];
 
 const LANGUAGES: { id: AppLanguage; label: string; flag: string }[] = [
@@ -124,26 +149,51 @@ export default function SettingsPage() {
 
       {/* Theme */}
       <Section title="Theme" icon={<Palette size={16} className="text-purple-500" />}>
-        <div className="grid grid-cols-2 gap-2 p-3">
+        <div className="grid grid-cols-2 gap-3 p-3">
           {THEMES.map((t) => (
             <motion.button
               key={t.id}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => setTheme(t.id)}
               className={cn(
-                "flex items-start gap-2.5 p-3 rounded-2xl border-2 text-left transition-colors",
-                theme === t.id
-                  ? "border-orange-400 bg-orange-50"
-                  : "border-gray-100 bg-gray-50 hover:bg-gray-100"
+                "relative rounded-2xl border-2 overflow-hidden text-left transition-all",
+                theme === t.id ? "border-orange-400 shadow-md" : "border-transparent"
               )}
             >
-              <span className="text-xl leading-none mt-0.5">{t.emoji}</span>
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-gray-900 leading-tight">{t.label}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{t.desc}</p>
+              {/* Mini app preview */}
+              <div className={cn("p-2.5 pb-2", t.bg)}>
+                {/* fake topbar */}
+                <div className={cn("h-1.5 rounded-full w-3/4 mb-2 opacity-40", t.pill)} />
+                {/* fake card row */}
+                <div className={cn("rounded-xl p-2", t.card)}>
+                  <div className="flex items-center gap-1.5">
+                    <div className={cn("w-5 h-5 rounded-lg flex-shrink-0", t.pill)} />
+                    <div className="flex-1 space-y-1">
+                      <div className={cn("h-1.5 rounded-full w-full opacity-70", t.dot)} />
+                      <div className={cn("h-1 rounded-full w-2/3 opacity-40", t.dot)} />
+                    </div>
+                  </div>
+                </div>
+                {/* fake bottom bar */}
+                <div className="flex gap-1 mt-2 justify-center">
+                  {[...Array(4)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={cn("h-1.5 rounded-full", i === 0 ? t.pill : t.dot, "opacity-50")}
+                      style={{ width: i === 0 ? 16 : 8 }}
+                    />
+                  ))}
+                </div>
+              </div>
+              {/* Label */}
+              <div className="px-3 py-2 bg-white">
+                <p className="text-xs font-black text-gray-900">{t.label}</p>
+                <p className="text-[10px] text-gray-400 leading-tight">{t.desc}</p>
               </div>
               {theme === t.id && (
-                <Check size={12} className="text-orange-500 ml-auto mt-0.5 flex-shrink-0" />
+                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center">
+                  <Check size={10} className="text-white" />
+                </div>
               )}
             </motion.button>
           ))}

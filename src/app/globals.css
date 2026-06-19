@@ -35,79 +35,95 @@
   --grad-to: #DC2626;
 }
 
-/* Sakura / Pink theme */
+/* =============================================
+   SAKURA — Warm pink, soft cherry blossom
+   ============================================= */
 .theme-sakura {
-  --primary: #ec4899;
-  --ring: #ec4899;
-  --thai-orange: #ec4899;
-  --grad-from: #ec4899;
+  --background: #fff5f7;
+  --card: #ffffff;
+  --border: #fce7ec;
+  --muted: #fff0f3;
+  --secondary: #fce7ec;
+  --primary: #e8547a;
+  --ring: #e8547a;
+  --grad-from: #e8547a;
   --grad-via: #f472b6;
-  --grad-to: #f43f5e;
+  --grad-to: #fb7185;
 }
+.theme-sakura body { background-color: #fff5f7; }
+.theme-sakura .bg-gray-50 { background-color: #fff0f3 !important; }
+.theme-sakura .bg-gray-100 { background-color: #fce7ec !important; }
+.theme-sakura .border-gray-100 { border-color: #fce7ec !important; }
+.theme-sakura .border-gray-200 { border-color: #fad0d9 !important; }
+.theme-sakura .text-gray-400 { color: #d4839a !important; }
+.theme-sakura .text-gray-500 { color: #b96a83 !important; }
 
-/* Ocean / Blue theme */
+/* =============================================
+   OCEAN — Cool teal, calm Andaman waters
+   ============================================= */
 .theme-ocean {
-  --primary: #2563eb;
-  --ring: #2563eb;
-  --thai-orange: #2563eb;
-  --grad-from: #2563eb;
-  --grad-via: #06b6d4;
-  --grad-to: #0ea5e9;
+  --background: #f0f8ff;
+  --card: #ffffff;
+  --border: #dbeafe;
+  --muted: #eff6ff;
+  --secondary: #dbeafe;
+  --primary: #0369a1;
+  --ring: #0ea5e9;
+  --grad-from: #0369a1;
+  --grad-via: #0ea5e9;
+  --grad-to: #06b6d4;
 }
+.theme-ocean body { background-color: #f0f8ff; }
+.theme-ocean .bg-gray-50 { background-color: #eff6ff !important; }
+.theme-ocean .bg-gray-100 { background-color: #dbeafe !important; }
+.theme-ocean .border-gray-100 { border-color: #dbeafe !important; }
+.theme-ocean .border-gray-200 { border-color: #bfdbfe !important; }
+.theme-ocean .text-gray-400 { color: #7da4c8 !important; }
+.theme-ocean .text-gray-500 { color: #4a7fa8 !important; }
+.theme-ocean .text-orange-500 { color: #0284c7 !important; }
+.theme-ocean .text-orange-600 { color: #0369a1 !important; }
+.theme-ocean .bg-orange-50 { background-color: #eff6ff !important; }
+.theme-ocean .bg-orange-100 { background-color: #dbeafe !important; }
+.theme-ocean .border-orange-400 { border-color: #38bdf8 !important; }
+.theme-ocean .text-amber-500 { color: #0ea5e9 !important; }
+.theme-ocean .text-amber-600 { color: #0284c7 !important; }
+.theme-ocean .bg-amber-50 { background-color: #e0f2fe !important; }
+.theme-ocean .fill-amber-400 { fill: #38bdf8 !important; }
 
-/* Dark / Night theme */
+/* =============================================
+   DARK — Deep slate, easy on eyes at night
+   ============================================= */
 .theme-dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
-  --border: #334155;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --secondary: #334155;
-  --secondary-foreground: #f1f5f9;
+  --background: #0f1117;
+  --foreground: #e2e8f0;
+  --card: #1a1f2e;
+  --card-foreground: #e2e8f0;
+  --border: #2d3748;
+  --muted: #1a1f2e;
+  --muted-foreground: #8892a4;
+  --secondary: #2d3748;
+  --secondary-foreground: #e2e8f0;
   color-scheme: dark;
 }
-
-.theme-dark body {
-  background-color: #0f172a;
-}
-
-.theme-dark .bg-white {
-  background-color: #1e293b !important;
-}
-
-.theme-dark .bg-gray-50 {
-  background-color: #0f172a !important;
-}
-
-.theme-dark .bg-gray-100 {
-  background-color: #1e293b !important;
-}
-
-.theme-dark .border-gray-100 {
-  border-color: #334155 !important;
-}
-
-.theme-dark .text-gray-900 {
-  color: #f1f5f9 !important;
-}
-
-.theme-dark .text-gray-700 {
-  color: #cbd5e1 !important;
-}
-
-.theme-dark .text-gray-600 {
-  color: #94a3b8 !important;
-}
-
-.theme-dark .text-gray-500 {
-  color: #64748b !important;
-}
-
-.theme-dark .text-gray-400 {
-  color: #475569 !important;
-}
+.theme-dark body { background-color: #0f1117; color: #e2e8f0; }
+.theme-dark .bg-white { background-color: #1a1f2e !important; }
+.theme-dark .bg-gray-50 { background-color: #0f1117 !important; }
+.theme-dark .bg-gray-100 { background-color: #242938 !important; }
+.theme-dark .bg-gray-950 { background-color: #070b12 !important; }
+.theme-dark .bg-gray-900 { background-color: #111623 !important; }
+.theme-dark .border-gray-100 { border-color: #2d3748 !important; }
+.theme-dark .border-gray-200 { border-color: #374151 !important; }
+.theme-dark .border-gray-800 { border-color: #1e2535 !important; }
+.theme-dark .text-gray-900 { color: #e2e8f0 !important; }
+.theme-dark .text-gray-800 { color: #cbd5e1 !important; }
+.theme-dark .text-gray-700 { color: #94a3b8 !important; }
+.theme-dark .text-gray-600 { color: #7480a0 !important; }
+.theme-dark .text-gray-500 { color: #5a6680 !important; }
+.theme-dark .text-gray-400 { color: #3f4d65 !important; }
+.theme-dark .text-gray-300 { color: #2d3a52 !important; }
+.theme-dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.5) !important; }
+.theme-dark .shadow { box-shadow: 0 2px 8px rgba(0,0,0,0.6) !important; }
+.theme-dark .shadow-md { box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important; }
 
 * {
   box-sizing: border-box;
