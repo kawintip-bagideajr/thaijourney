@@ -5,6 +5,15 @@ import { TIME_VOCAB, DAYS_MONTHS, TIME_PHRASES } from "./time";
 import { WEATHER_VOCAB, THAI_SEASONS } from "./weather";
 import { THAI_CUSTOMS, THAI_FESTIVALS } from "./culture";
 import { WORK_VOCAB, OFFICE_PHRASES } from "./work";
+import { EMOTIONS_VOCAB, EMOTIONS_EXPRESSIONS } from "./emotions";
+import { COLORS_VOCAB, COLORS_ADJECTIVES } from "./colors";
+import { BODY_PARTS, BODY_PHRASES } from "./body";
+import { ANIMALS_VOCAB, NATURE_VOCAB } from "./animals";
+import { THAI_SLANG, CASUAL_SPEECH } from "./slang";
+import {
+  PROVINCE_BANGKOK, PROVINCE_CHIANG_MAI, PROVINCE_PHUKET,
+  PROVINCE_AYUTTHAYA, PROVINCE_KRABI, PROVINCE_CHIANG_RAI,
+} from "./province-lessons";
 
 const NUMBERS_1_10: ActiveExercise[] = [
   {
@@ -652,6 +661,34 @@ const LESSON_MAP: Record<string, ActiveExercise[]> = {
   // Work module
   "work/work-vocab": WORK_VOCAB,
   "work/office-phrases": OFFICE_PHRASES,
+
+  // Emotions module
+  "emotions/emotions-vocab": EMOTIONS_VOCAB,
+  "emotions/emotions-expressions": EMOTIONS_EXPRESSIONS,
+
+  // Colors & Adjectives module
+  "colors/colors-vocab": COLORS_VOCAB,
+  "colors/adjectives": COLORS_ADJECTIVES,
+
+  // Body module
+  "body/body-parts": BODY_PARTS,
+  "body/body-phrases": BODY_PHRASES,
+
+  // Animals & Nature module
+  "animals/animals-vocab": ANIMALS_VOCAB,
+  "animals/nature-vocab": NATURE_VOCAB,
+
+  // Slang module
+  "slang/thai-slang": THAI_SLANG,
+  "slang/casual-speech": CASUAL_SPEECH,
+
+  // Province Adventure Lessons
+  "province/lesson/bangkok": PROVINCE_BANGKOK,
+  "province/lesson/chiang_mai": PROVINCE_CHIANG_MAI,
+  "province/lesson/phuket": PROVINCE_PHUKET,
+  "province/lesson/ayutthaya": PROVINCE_AYUTTHAYA,
+  "province/lesson/krabi": PROVINCE_KRABI,
+  "province/lesson/chiang_rai": PROVINCE_CHIANG_RAI,
 };
 
 export function getLessonExercises(moduleId: string, lessonId: string): ActiveExercise[] {

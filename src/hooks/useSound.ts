@@ -1,5 +1,6 @@
 "use client";
 import { useCallback } from "react";
+import { useSettingsStore } from "@/store/settingsStore";
 
 let sharedCtx: AudioContext | null = null;
 
@@ -28,32 +29,47 @@ function tone(freq: number, duration: number, type: OscillatorType = "sine", gai
 }
 
 export function useSound() {
+  const sfxEnabled = useSettingsStore((s) => s.sfxEnabled);
+  const sfxVolume = useSettingsStore((s) => s.sfxVolume);
+
+  const play = useCallback((fn: (vol: number) => void) => {
+    if (sfxEnabled) fn(sfxVolume);
+  }, [sfxEnabled, sfxVolume]);
+
   const playClick = useCallback(() => {
-    tone(700, 0.05, "square", 0.1);
-  }, []);
+    play((v) => tone(700, 0.05, "square", 0.1 * v));
+  }, [play]);
 
   const playCorrect = useCallback(() => {
-    tone(523.25, 0.12, "sine", 0.22);
-    tone(659.25, 0.12, "sine", 0.22, 0.1);
-    tone(783.99, 0.22, "sine", 0.22, 0.2);
-  }, []);
+    play((v) => {
+      tone(523.25, 0.12, "sine", 0.22 * v);
+      tone(659.25, 0.12, "sine", 0.22 * v, 0.1);
+      tone(783.99, 0.22, "sine", 0.22 * v, 0.2);
+    });
+  }, [play]);
 
   const playWrong = useCallback(() => {
-    tone(220, 0.12, "sawtooth", 0.18);
-    tone(185, 0.18, "sawtooth", 0.15, 0.13);
-  }, []);
+    play((v) => {
+      tone(220, 0.12, "sawtooth", 0.18 * v);
+      tone(185, 0.18, "sawtooth", 0.15 * v, 0.13);
+    });
+  }, [play]);
 
   const playComplete = useCallback(() => {
-    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
-      tone(f, 0.2, "sine", 0.2, i * 0.13);
+    play((v) => {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        tone(f, 0.2, "sine", 0.2 * v, i * 0.13);
+      });
     });
-  }, []);
+  }, [play]);
 
   const playUnlock = useCallback(() => {
-    [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
-      tone(f, 0.15, "triangle", 0.18, i * 0.09);
+    play((v) => {
+      [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        tone(f, 0.15, "triangle", 0.18 * v, i * 0.09);
+      });
     });
-  }, []);
+  }, [play]);
 
   return { playClick, playCorrect, playWrong, playComplete, playUnlock };
 }

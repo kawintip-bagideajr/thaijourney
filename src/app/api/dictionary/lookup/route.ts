@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { getUserFromSession, adminDb } from "@/lib/firebase/server";
 
 function sanitizeAscii(s: string): string {
-  // Keep only printable ASCII (32–126) — removes BOM (65279), control chars, newlines
   return Array.from(s)
     .filter((c) => c.charCodeAt(0) >= 32 && c.charCodeAt(0) <= 126)
     .join("")
@@ -10,8 +11,23 @@ function sanitizeAscii(s: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // Pro-only check
+    try {
+      const cookieStore = await cookies();
+      const user = await getUserFromSession(cookieStore.get("__session")?.value);
+      if (!user) {
+        return NextResponse.json({ error: "Please log in to use AI Dictionary" }, { status: 401 });
+      }
+      const profileDoc = await adminDb.collection("profiles").doc(user.uid).get();
+      const tier = profileDoc.data()?.access_tier ?? "free";
+      if (tier !== "pro") {
+        return NextResponse.json({ error: "PRO_REQUIRED" }, { status: 403 });
+      }
+    } catch {
+      return NextResponse.json({ error: "Authentication error" }, { status: 401 });
+    }
+
     const body = await req.json();
-    // Strip zero-width / invisible Unicode chars from the search word
     const word = (typeof body.word === "string" ? body.word : "")
       .replace(/[​‌‍­﻿]/g, "")
       .trim();
@@ -20,51 +36,57 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No word provided" }, { status: 400 });
     }
 
-    // Strip BOM, newlines, non-ASCII from API key before using it as an HTTP header
-    const apiKey = sanitizeAscii(process.env.ANTHROPIC_API_KEY ?? "");
+    const apiKey = sanitizeAscii(process.env.OPENROUTER_API_KEY ?? "");
 
-    if (!apiKey) {
-      return NextResponse.json({ error: "API key not configured" }, { status: 500 });
+    if (!apiKey || apiKey.length < 20) {
+      return NextResponse.json(
+        { error: "OPENROUTER_API_KEY ไม่ได้ตั้งค่า" },
+        { status: 500 }
+      );
     }
 
-    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://thaijourney.vercel.app",
+        "X-Title": "ThaiJN Dictionary",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 350,
-        system: `You are a Thai-English dictionary assistant. Respond ONLY in this format:
+        model: "openai/gpt-oss-120b:free",
+        max_tokens: 160,
+        messages: [
+          {
+            role: "system",
+            content: `Thai-English dictionary for English speakers. Respond in exactly 3 lines:
 
-**[Thai word]** ([romanization]) — [English meaning]
-*Part of speech:* [noun/verb/adj/adv/phrase/proper noun]
-Example: [Thai sentence] ([romanization]) — "[English translation]"
+Line 1: Thai script (romanization) · part of speech
+Line 2: Meaning: English definition
+Line 3: Example: Thai sentence — English translation
 
-Rules:
-- English input → give Thai equivalent(s)
-- Thai input → translate to English
-- List top 2 meanings if multiple exist
-- Proper nouns/names: identify them as such
-- No extra commentary`,
-        messages: [{ role: "user", content: word }],
+No extra text. Always include the Thai script characters on line 1.`,
+          },
+          {
+            role: "user",
+            content: word,
+          },
+        ],
       }),
     });
 
-    if (!anthropicRes.ok) {
-      let errMsg = `API error ${anthropicRes.status}`;
+    if (!res.ok) {
+      let errMsg = `API error ${res.status}`;
       try {
-        const errData = await anthropicRes.json() as { error?: { message?: string } };
+        const errData = await res.json() as { error?: { message?: string } };
         errMsg = errData?.error?.message ?? errMsg;
-      } catch { /* ignore parse failure */ }
-      console.error("Anthropic error:", errMsg);
+      } catch { /* ignore */ }
+      console.error("[lookup] OpenRouter error:", errMsg);
       return NextResponse.json({ error: errMsg }, { status: 502 });
     }
 
-    const data = await anthropicRes.json() as { content: Array<{ type: string; text: string }> };
-    const result = data.content?.[0]?.type === "text" ? data.content[0].text : "";
+    const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+    const result = (data.choices?.[0]?.message?.content ?? "").trim();
 
     if (!result) {
       return NextResponse.json({ error: "Empty response from AI" }, { status: 502 });
@@ -73,7 +95,7 @@ Rules:
     return NextResponse.json({ result });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.error("Dictionary lookup error:", msg);
+    console.error("[lookup] Error:", msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -97,7 +97,7 @@ export default function LoginPage() {
         <Link href="/" className="inline-flex items-center gap-2 mb-6 lg:hidden">
           <AppLogoIcon size={32} />
           <span className="font-black text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-            ThaiJourney
+            ThaiJN
           </span>
         </Link>
         <h1 className="text-3xl font-black text-gray-900">Welcome back</h1>

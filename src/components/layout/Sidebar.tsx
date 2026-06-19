@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard, BookOpen, Map, Trophy, MessageCircle,
-  Star, User, Settings, LogOut, Flame, BookMarked,
+  Star, User, Settings, LogOut, Flame, BookMarked, Crown, Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -35,7 +35,7 @@ export function Sidebar() {
         <AppLogoIcon size={40} />
         <div>
           <span className="text-xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-            ThaiJourney
+            ThaiJN
           </span>
           <p className="text-[10px] text-gray-400 -mt-1">Learn Thai Adventurously</p>
         </div>
@@ -80,6 +80,18 @@ export function Sidebar() {
 
       {/* Bottom */}
       <div className="border-t pt-4 flex flex-col gap-1">
+        <Link href="/pricing">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+            <Crown size={18} className="text-amber-400" />
+            Upgrade to Pro
+          </div>
+        </Link>
+        <Link href="/donate">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+            <Heart size={18} className="text-rose-400" />
+            Donate
+          </div>
+        </Link>
         <Link href="/settings">
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
             <Settings size={18} className="text-gray-400" />

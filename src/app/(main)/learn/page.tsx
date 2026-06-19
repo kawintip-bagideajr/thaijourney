@@ -106,12 +106,57 @@ const MODULES = [
     ],
   },
   {
+    id: "emotions", track: "beginner",
+    title: "Emotions & Feelings", description: "Express how you feel — happy, sad, excited, in love",
+    icon: "🥰", color: "from-pink-400 to-fuchsia-400", bgColor: "bg-pink-50", requiredXP: 175,
+    lessons: [
+      { id: "emotions-vocab", title: "Emotion Vocabulary", type: "vocabulary", xp: 20 },
+      { id: "emotions-expressions", title: "Feeling Expressions", type: "grammar", xp: 20 },
+    ],
+  },
+  {
+    id: "colors", track: "beginner",
+    title: "Colors & Adjectives", description: "Describe the world around you in Thai",
+    icon: "🎨", color: "from-violet-400 to-purple-500", bgColor: "bg-violet-50", requiredXP: 225,
+    lessons: [
+      { id: "colors-vocab", title: "Thai Colors", type: "vocabulary", xp: 15 },
+      { id: "adjectives", title: "Describing Things", type: "vocabulary", xp: 20 },
+    ],
+  },
+  {
+    id: "body", track: "beginner",
+    title: "Body & Health", description: "Know your body parts and describe aches",
+    icon: "🧍", color: "from-teal-400 to-cyan-500", bgColor: "bg-teal-50", requiredXP: 280,
+    lessons: [
+      { id: "body-parts", title: "Body Parts", type: "vocabulary", xp: 20 },
+      { id: "body-phrases", title: "Describing Symptoms", type: "grammar", xp: 20 },
+    ],
+  },
+  {
+    id: "animals", track: "intermediate",
+    title: "Animals & Nature", description: "Thailand's wildlife, landscapes, and the natural world",
+    icon: "🐘", color: "from-lime-400 to-green-500", bgColor: "bg-lime-50", requiredXP: 320,
+    lessons: [
+      { id: "animals-vocab", title: "Thai Animals", type: "vocabulary", xp: 20 },
+      { id: "nature-vocab", title: "Nature & Landscape", type: "vocabulary", xp: 20 },
+    ],
+  },
+  {
     id: "work", track: "advanced",
     title: "Work & Business", description: "Professional Thai for the workplace",
     icon: "💼", color: "from-slate-400 to-gray-600", bgColor: "bg-slate-50", requiredXP: 400,
     lessons: [
       { id: "work-vocab", title: "Work Vocabulary", type: "vocabulary", xp: 30 },
       { id: "office-phrases", title: "Office Phrases", type: "grammar", xp: 30 },
+    ],
+  },
+  {
+    id: "slang", track: "advanced",
+    title: "Thai Slang & Casual Speech", description: "Speak like a local — particles, slang, everyday chat",
+    icon: "💬", color: "from-yellow-400 to-orange-400", bgColor: "bg-yellow-50", requiredXP: 500,
+    lessons: [
+      { id: "thai-slang", title: "Thai Slang Words", type: "vocabulary", xp: 30 },
+      { id: "casual-speech", title: "Casual Particles & Tone", type: "grammar", xp: 35 },
     ],
   },
 ];

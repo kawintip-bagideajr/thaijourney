@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Link href="/admin" className="flex items-center gap-2.5 px-2 mb-8">
           <AppLogoIcon size={32} />
           <div>
-            <p className="text-sm font-black text-white">ThaiJourney</p>
+            <p className="text-sm font-black text-white">ThaiJN</p>
             <p className="text-[10px] text-gray-400">Admin Panel</p>
           </div>
         </Link>

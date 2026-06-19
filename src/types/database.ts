@@ -1,6 +1,8 @@
 export type UserRole = "user" | "admin" | "moderator";
 export type LearningGoal = "travel" | "work" | "study" | "fluency";
 export type Track = "beginner" | "intermediate" | "advanced";
+export type AccessTier = "free" | "pro";
+export type AppLanguage = "en" | "th" | "ja" | "zh" | "ko" | "fr";
 export type LessonType = "vocabulary" | "grammar" | "culture" | "listening" | "speaking";
 export type ExerciseType =
   | "multiple_choice"
@@ -29,6 +31,8 @@ export interface Profile {
   hearts: number;
   hearts_updated_at: string;
   role: UserRole;
+  access_tier?: AccessTier;
+  app_language?: AppLanguage;
   created_at: string;
   updated_at: string;
 }

@@ -124,7 +124,7 @@ export default function SignupPage() {
       <div className="text-center lg:text-left">
         <Link href="/" className="inline-flex items-center gap-2 mb-6 lg:hidden">
           <AppLogoIcon size={32} />
-          <span className="font-black text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">ThaiJourney</span>
+          <span className="font-black text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">ThaiJN</span>
         </Link>
         <h1 className="text-3xl font-black text-gray-900">Start your journey</h1>
         <p className="text-gray-500 mt-1">Free forever. No credit card needed.</p>

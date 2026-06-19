@@ -36,7 +36,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <AppLogoIcon size={36} />
             <span className="text-xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-              ThaiJourney
+              ThaiJN
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -216,7 +216,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-100 py-8 px-4 text-center text-sm text-gray-400">
-        <p>© 2026 ThaiJourney. Made with ❤️ for Thai language learners worldwide.</p>
+        <p>© 2026 ThaiJN. Made with ❤️ for Thai language learners worldwide.</p>
       </footer>
     </div>
   );

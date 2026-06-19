@@ -6,21 +6,21 @@ import { useAuthStore } from "@/store/authStore";
 import { PROVINCES, type ProvinceData } from "@/data/provinces";
 import { ProvinceModal } from "@/components/map/ProvinceModal";
 import { formatNumber, cn } from "@/lib/utils";
-import { Zap, Lock, Star, MapPin } from "lucide-react";
+import { Zap, Lock, Star, MapPin, Sparkles } from "lucide-react";
 import { useSound } from "@/hooks/useSound";
 import { speakThai } from "@/lib/speech";
 
 const LESSON_LINKS: Record<string, string> = {
-  bangkok: "/learn/greetings/lesson/greet-basics",
-  chiang_mai: "/learn/food/lesson/food-vocab",
-  ayutthaya: "/learn/transport/lesson/transport-vocab",
+  bangkok: "/learn/province/lesson/bangkok",
+  chiang_mai: "/learn/province/lesson/chiang_mai",
+  ayutthaya: "/learn/province/lesson/ayutthaya",
   khao_yai: "/learn/numbers/lesson/numbers-1-10",
-  chiang_rai: "/learn/numbers/lesson/numbers-11-100",
-  sukhothai: "/learn/numbers/lesson/classifiers",
-  phuket: "/learn/shopping/lesson/shopping-vocab",
-  pai: "/learn/emergency/lesson/emergency-phrases",
-  krabi: "/learn/emergency/lesson/hospital",
-  koh_samui: "/learn",
+  chiang_rai: "/learn/province/lesson/chiang_rai",
+  sukhothai: "/learn/culture/lesson/customs",
+  phuket: "/learn/province/lesson/phuket",
+  pai: "/learn/weather/lesson/seasons",
+  krabi: "/learn/province/lesson/krabi",
+  koh_samui: "/learn/animals/lesson/nature-vocab",
 };
 
 const SORTED_PROVINCES = [...PROVINCES].sort((a, b) => a.unlock_xp - b.unlock_xp);
@@ -157,7 +157,14 @@ export default function MapPage() {
                   <p className="font-black text-sm text-gray-900 leading-tight">{province.name_en}</p>
                   <p className="thai-text text-xs text-gray-500">{province.name_th}</p>
                   {isUnlocked ? (
-                    <p className="text-xs text-green-500 font-bold mt-1">✓ Unlocked</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <p className="text-xs text-green-500 font-bold">✓ Unlocked</p>
+                      {LESSON_LINKS[province.id]?.includes("/province/") && (
+                        <span className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
+                          <Sparkles size={7} />Adventure
+                        </span>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-xs text-orange-400 font-bold mt-1">
                       🔒 {province.unlock_xp} XP

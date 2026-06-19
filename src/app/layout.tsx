@@ -14,7 +14,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "ThaiJourney — Learn Thai Through Adventure",
+  title: "ThaiJN — Learn Thai Through Adventure",
   description: "The gamified Thai language learning platform. Unlock Thailand's 77 provinces as you master the language.",
   keywords: ["learn Thai", "Thai language", "Thai lessons", "Thai alphabet"],
   icons: {

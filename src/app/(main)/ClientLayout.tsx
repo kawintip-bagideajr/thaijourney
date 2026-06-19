@@ -6,7 +6,9 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { TopBar } from "@/components/layout/TopBar";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { PageLoader } from "@/components/shared/LoadingSpinner";
+import { cn } from "@/lib/utils";
 
 const FIREBASE_CONFIGURED = !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
@@ -15,7 +17,7 @@ const DEMO_PROFILE = {
   username: "demo_explorer",
   display_name: "Demo Explorer",
   avatar_url: null,
-  bio: "Exploring Thai with ThaiJourney!",
+  bio: "Exploring Thai with ThaiJN!",
   country: "🌏 International",
   learning_goal: "travel" as const,
   daily_goal_minutes: 15,
@@ -34,9 +36,16 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const { profile, isLoading } = useAuth();
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const setProfile = useAuthStore((s) => s.setProfile);
+  const theme = useSettingsStore((s) => s.theme);
   const router = useRouter();
   const pathname = usePathname();
   const isLesson = pathname.includes("/lesson/");
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("theme-sakura", "theme-ocean", "theme-dark");
+    if (theme !== "light") root.classList.add(`theme-${theme}`);
+  }, [theme]);
 
   // Safety net: if Firebase Auth never resolves within 8s, force full sign-out + redirect
   useEffect(() => {
@@ -73,11 +82,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   if (FIREBASE_CONFIGURED && !profile) return <PageLoader />;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-dvh bg-gray-50 overflow-x-hidden">
       <Sidebar />
-      <div className="flex-1 lg:ml-64 flex flex-col">
+      <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
         <TopBar />
-        <main className={isLesson ? "flex-1" : "flex-1 pb-20 lg:pb-6"}>
+        <main className={cn(isLesson ? "flex-1" : "flex-1 pb-24 lg:pb-6", "min-w-0 overflow-x-hidden")}>
           {children}
         </main>
       </div>

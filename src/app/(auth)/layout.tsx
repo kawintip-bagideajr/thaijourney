@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="flex justify-center mb-6 animate-float">
             <AppLogoIcon size={96} />
           </div>
-          <h1 className="text-4xl font-black mb-4">ThaiJourney</h1>
+          <h1 className="text-4xl font-black mb-4">ThaiJN</h1>
           <p className="text-xl opacity-90 mb-8">
             Unlock Thailand through language.<br />
             Start your adventure today.
