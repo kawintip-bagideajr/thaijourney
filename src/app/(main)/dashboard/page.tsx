@@ -171,12 +171,12 @@ export default function DashboardPage() {
         <Link href="/map" className="group bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border border-green-100 hover:shadow-md transition-all">
           <div className="text-3xl mb-3">🗺️</div>
           <p className="font-bold text-green-900">Adventure Map</p>
-          <p className="text-sm text-green-600 mt-1">Unlock new provinces</p>
+          <p className="text-sm text-emerald-600 mt-1">Unlock new provinces</p>
         </Link>
         <Link href="/chat" className="group bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-5 border border-purple-100 hover:shadow-md transition-all">
           <div className="text-3xl mb-3">🤖</div>
           <p className="font-bold text-purple-900">AI Chat</p>
-          <p className="text-sm text-purple-600 mt-1">Practice conversation</p>
+          <p className="text-sm text-violet-600 mt-1">Practice conversation</p>
         </Link>
       </motion.div>
     </div>
