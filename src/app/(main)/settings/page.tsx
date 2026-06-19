@@ -125,7 +125,7 @@ export default function SettingsPage() {
               <motion.div
                 animate={{ x: sfxEnabled ? 22 : 2 }}
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow"
+                className="absolute top-0.5 w-5 h-5 bg-zinc-100 rounded-full shadow"
               />
             </button>
           }
@@ -232,7 +232,7 @@ export default function SettingsPage() {
           description="Remind me to practice every day"
           right={
             <button className="w-11 h-6 rounded-full bg-gray-200 relative">
-              <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow" />
+              <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-zinc-100 rounded-full shadow" />
             </button>
           }
         />
