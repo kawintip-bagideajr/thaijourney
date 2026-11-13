@@ -6,13 +6,17 @@ import { useAuthStore } from "@/store/authStore";
 import { LevelBadge } from "@/components/gamification/LevelBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { xpProgressInLevel, formatNumber, cn } from "@/lib/utils";
+import { xpProgressInLevel, formatNumber, cn, calcCurrentHearts, MAX_HEARTS } from "@/lib/utils";
 import { ProgressBar } from "@/components/shared/ProgressBar";
 import { Badge } from "@/components/ui/badge";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { db } from "@/lib/firebase/client";
 import { doc, updateDoc } from "firebase/firestore";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { LearningGoal } from "@/types/database";
+import { cosmeticBannerStyle } from "@/data/cosmetics";
+import { AvatarFrame, TitleTag } from "@/components/cosmetics/Cosmetics";
+import { CollectionPanel } from "@/components/cosmetics/CollectionPanel";
 
 const GOALS = [
   { value: "travel", label: "🌏 Travel" },
@@ -35,6 +39,8 @@ const BG_PRESETS = [
 ];
 
 function getBgStyle(bgId: string | null | undefined): React.CSSProperties {
+  const won = cosmeticBannerStyle(bgId);
+  if (won) return won;
   const preset = BG_PRESETS.find((b) => b.id === bgId) ?? BG_PRESETS[0];
   return { background: `linear-gradient(135deg, ${preset.from}, ${preset.to})` };
 }
@@ -67,6 +73,7 @@ async function compressImage(file: File, maxPx = 128): Promise<string> {
 export default function ProfilePage() {
   const profile = useAuthStore((s) => s.profile);
   const setProfile = useAuthStore((s) => s.setProfile);
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -138,41 +145,54 @@ export default function ProfilePage() {
   const avatarDisplay = isEditing ? editForm.avatar_url : profile.avatar_url;
   const bgStyle = isEditing ? getBgStyle(editForm.profile_bg) : getBgStyle(profile.profile_bg);
 
+
+  const fieldLabel = "block text-[11px] font-extrabold text-gray-500 mb-1.5";
+  const rawField = "w-full rounded-2xl border-2 border-[var(--game-edge)] bg-white px-4 font-bold text-sm text-gray-800 focus:border-orange-300 focus:ring-4 focus:ring-orange-100 outline-none transition";
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 py-5 space-y-5">
       {/* Profile card */}
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+        className="game-card overflow-hidden"
       >
         {/* Cover */}
-        <div className="h-32 relative transition-all duration-300" style={bgStyle}>
+        <div className="h-32 relative transition-all duration-300 border-b-2 border-[var(--game-edge)]" style={bgStyle}>
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{ backgroundImage: "radial-gradient(circle at 12px 12px, rgba(255,255,255,0.7) 2px, transparent 2.5px)", backgroundSize: "24px 24px" }}
+            aria-hidden="true"
+          />
           {isEditing && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-white/80 text-xs font-semibold">Choose background below</p>
+              <p className="bg-white/85 backdrop-blur rounded-full px-3 py-1 border-2 border-white text-gray-700 text-xs font-extrabold">
+                <span aria-hidden="true">🎨 </span>{t("profile.chooseBg")}
+              </p>
             </div>
           )}
         </div>
 
         {/* Avatar + info */}
-        <div className="px-6 pb-6 -mt-10">
-          <div className="flex items-end justify-between mb-4">
-            <div className="relative">
-              <div className="w-20 h-20 rounded-2xl border-4 border-white flex items-center justify-center shadow-lg overflow-hidden"
+        <div className="px-5 sm:px-6 pb-6 -mt-10">
+          <div className="flex items-end justify-between gap-3 mb-4">
+            <div className="relative shrink-0">
+              <AvatarFrame frameId={profile.equipped_frame} thickness={5}>
+              <div className="w-20 h-20 rounded-3xl border-4 border-white flex items-center justify-center shadow-[0_4px_0_var(--game-edge)] overflow-hidden"
                 style={isEmojiAvatar(avatarDisplay) || !avatarDisplay ? bgStyle : {}}>
                 {avatarDisplay ? (
                   isEmojiAvatar(avatarDisplay) ? (
-                    <span className="text-3xl">{avatarDisplay}</span>
+                    <span className="text-4xl">{avatarDisplay}</span>
                   ) : (
                     <img src={avatarDisplay} alt="avatar" className="w-full h-full object-cover" />
                   )
                 ) : (
-                  <span className="text-3xl font-black text-white">
+                  <span className="text-3xl font-display text-white">
                     {(profile.display_name ?? profile.username)[0].toUpperCase()}
                   </span>
                 )}
               </div>
+              </AvatarFrame>
               <div className="absolute -bottom-1 -right-1">
                 <LevelBadge level={profile.level} size="sm" />
               </div>
@@ -181,27 +201,28 @@ export default function ProfilePage() {
               variant="outline"
               size="sm"
               onClick={isEditing ? () => setIsEditing(false) : startEditing}
-              className="gap-2"
+              className="gap-2 rounded-2xl"
             >
               <Edit3 size={14} />
-              {isEditing ? "Cancel" : "Edit Profile"}
+              {isEditing ? t("profile.cancel") : t("profile.editProfile")}
             </Button>
           </div>
 
           {!isEditing ? (
             <>
-              <h1 className="text-2xl font-black text-gray-900">{profile.display_name ?? profile.username}</h1>
-              <p className="text-gray-500">@{profile.username}</p>
-              {profile.bio && <p className="text-gray-600 text-sm mt-2">{profile.bio}</p>}
+              <h1 className="font-display text-2xl sm:text-3xl text-gray-900 leading-tight break-words">{profile.display_name ?? profile.username}</h1>
+              <p className="text-sm font-bold text-gray-500">@{profile.username}</p>
+              {profile.equipped_title && <div className="mt-1.5"><TitleTag titleId={profile.equipped_title} /></div>}
+              {profile.bio && <p className="text-gray-600 text-sm font-semibold mt-2">{profile.bio}</p>}
               {profile.country && (
-                <div className="mt-2"><Badge variant="secondary">{profile.country}</Badge></div>
+                <div className="mt-2"><Badge variant="secondary"><span aria-hidden="true">📍</span>{profile.country}</Badge></div>
               )}
             </>
           ) : (
             <div className="space-y-4 mt-2">
               {/* Avatar picker */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-2">Avatar</label>
+              <div className="rounded-2xl bg-orange-50 border-2 border-orange-100 p-3">
+                <label className={fieldLabel}>{t("profile.avatar")}</label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {AVATAR_PRESETS.map((emoji) => (
                     <button
@@ -209,10 +230,10 @@ export default function ProfilePage() {
                       type="button"
                       onClick={() => setEditForm((f) => ({ ...f, avatar_url: emoji }))}
                       className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center text-xl border-2 transition-all",
+                        "w-11 h-11 rounded-2xl flex items-center justify-center text-xl border-2 transition-all hover:-translate-y-0.5",
                         editForm.avatar_url === emoji
-                          ? "border-orange-400 bg-orange-50 scale-110"
-                          : "border-gray-200 bg-white hover:border-gray-300"
+                          ? "border-orange-400 bg-white scale-110 shadow-[0_3px_0_#fdba74]"
+                          : "border-[var(--game-edge)] bg-white shadow-[0_3px_0_var(--game-edge)] hover:border-orange-200"
                       )}
                     >
                       {emoji}
@@ -222,35 +243,35 @@ export default function ProfilePage() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all text-gray-400 hover:text-gray-600",
+                      "w-11 h-11 rounded-2xl flex items-center justify-center border-2 transition-all text-gray-400 hover:text-gray-600 hover:-translate-y-0.5",
                       !isEmojiAvatar(editForm.avatar_url) && editForm.avatar_url
-                        ? "border-orange-400 bg-orange-50"
-                        : "border-dashed border-gray-300 bg-gray-50 hover:border-gray-400"
+                        ? "border-orange-400 bg-white shadow-[0_3px_0_#fdba74]"
+                        : "border-dashed border-gray-300 bg-white/70 hover:border-orange-300"
                     )}
-                    title="Upload photo"
+                    title={t("profile.uploadPhoto")}
                   >
-                    {uploadingPhoto ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                    {uploadingPhoto ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                   </button>
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
                 </div>
                 {!isEmojiAvatar(editForm.avatar_url) && editForm.avatar_url && (
                   <div className="flex items-center gap-2">
-                    <img src={editForm.avatar_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
-                    <span className="text-xs text-gray-500">Custom photo selected</span>
+                    <img src={editForm.avatar_url} alt="" className="w-8 h-8 rounded-xl object-cover border-2 border-white" />
+                    <span className="text-xs font-bold text-gray-500">{t("profile.customPhoto")}</span>
                     <button
                       type="button"
                       onClick={() => setEditForm((f) => ({ ...f, avatar_url: "" }))}
-                      className="text-xs text-red-400 hover:text-red-600"
+                      className="text-xs font-extrabold text-red-400 hover:text-red-600"
                     >
-                      Remove
+                      {t("profile.remove")}
                     </button>
                   </div>
                 )}
               </div>
 
               {/* Background picker */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-2">Profile Background</label>
+              <div className="rounded-2xl bg-orange-50 border-2 border-orange-100 p-3">
+                <label className={fieldLabel}>{t("profile.profileBg")}</label>
                 <div className="flex flex-wrap gap-2">
                   {BG_PRESETS.map((bg) => (
                     <button
@@ -258,8 +279,8 @@ export default function ProfilePage() {
                       type="button"
                       onClick={() => setEditForm((f) => ({ ...f, profile_bg: bg.id }))}
                       className={cn(
-                        "w-8 h-8 rounded-lg transition-all border-2",
-                        editForm.profile_bg === bg.id ? "border-gray-900 scale-110" : "border-transparent hover:scale-105"
+                        "w-10 h-10 rounded-2xl transition-all border-[3px] shadow-[0_3px_0_rgba(0,0,0,0.15)]",
+                        editForm.profile_bg === bg.id ? "border-gray-900 scale-110" : "border-white hover:-translate-y-0.5"
                       )}
                       style={{ background: `linear-gradient(135deg, ${bg.from}, ${bg.to})` }}
                       title={bg.label}
@@ -270,69 +291,69 @@ export default function ProfilePage() {
 
               {/* Text fields */}
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Display Name</label>
+                <label className={fieldLabel}>{t("profile.displayName")}</label>
                 <Input
                   value={editForm.display_name}
                   onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
-                  placeholder="Your display name"
+                  placeholder={t("profile.displayNamePh")}
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Bio</label>
+                <label className={fieldLabel}>{t("profile.bio")}</label>
                 <textarea
                   value={editForm.bio}
                   onChange={(e) => setEditForm((f) => ({ ...f, bio: e.target.value }))}
-                  placeholder="A little about yourself..."
+                  placeholder={t("profile.bioPh")}
                   rows={2}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className={cn(rawField, "py-3 resize-none")}
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Country</label>
+                <label className={fieldLabel}>{t("profile.country")}</label>
                 <Input
                   value={editForm.country}
                   onChange={(e) => setEditForm((f) => ({ ...f, country: e.target.value }))}
-                  placeholder="e.g. United States"
+                  placeholder={t("profile.countryPh")}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Learning Goal</label>
+                  <label className={fieldLabel}>{t("profile.learningGoal")}</label>
                   <select
                     value={editForm.learning_goal}
                     onChange={(e) => setEditForm((f) => ({ ...f, learning_goal: e.target.value }))}
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+                    className={cn(rawField, "h-12")}
                   >
-                    <option value="">Select goal</option>
+                    <option value="">{t("profile.selectGoal")}</option>
                     {GOALS.map((g) => (
                       <option key={g.value} value={g.value}>{g.label}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Daily Goal</label>
+                  <label className={fieldLabel}>{t("profile.dailyGoal")}</label>
                   <select
                     value={editForm.daily_goal_minutes}
                     onChange={(e) => setEditForm((f) => ({ ...f, daily_goal_minutes: Number(e.target.value) }))}
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+                    className={cn(rawField, "h-12")}
                   >
                     {[5, 10, 15, 20, 30].map((m) => (
-                      <option key={m} value={m}>{m} min / day</option>
+                      <option key={m} value={m}>{t("common.minPerDay", { n: m })}</option>
                     ))}
                   </select>
                 </div>
               </div>
-              <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
-                {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : "Save Changes"}
+              <Button onClick={handleSave} disabled={saving} size="lg" className="w-full gap-2 font-display">
+                {saving ? <><Loader2 size={16} className="animate-spin" /> {t("common.saving")}</> : t("profile.saveChanges")}
               </Button>
             </div>
           )}
 
           {/* XP progress */}
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="font-medium text-gray-600">Level {profile.level}</span>
-              <span className="text-gray-400">{current} / {needed} XP to Level {profile.level + 1}</span>
+          <div className="mt-5 rounded-2xl bg-amber-50 border-2 border-amber-200 p-3 space-y-2">
+            <div className="flex justify-between items-center gap-2 text-sm">
+              <span className="font-display text-gray-800"><span aria-hidden="true">⭐ </span>{t("common.level", { n: profile.level })}</span>
+              <span className="text-[11px] font-extrabold text-gray-500 tabular-nums text-right">{t("profile.xpToNext", { current, needed, n: profile.level + 1 })}</span>
             </div>
             <ProgressBar value={pct} />
           </div>
@@ -340,33 +361,38 @@ export default function ProfilePage() {
       </motion.div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="game-panel grid grid-cols-2 sm:grid-cols-4 gap-y-4 py-4">
         {[
-          { label: "Total XP", value: formatNumber(profile.total_xp), icon: "⚡", color: "text-amber-600" },
-          { label: "Streak", value: `${profile.current_streak}d`, icon: "🔥", color: "text-orange-500" },
-          { label: "Best Streak", value: `${profile.longest_streak}d`, icon: "🏆", color: "text-purple-500" },
-          { label: "Hearts", value: `${profile.hearts}/5`, icon: "❤️", color: "text-red-500" },
+          { label: t("profile.totalXp"), value: formatNumber(profile.total_xp), icon: "⚡", color: "text-amber-600", tile: "bg-amber-50 border-amber-200" },
+          { label: t("profile.streak"), value: t("common.dayShort", { n: profile.current_streak }), icon: "🔥", color: "text-orange-500", tile: "bg-orange-50 border-orange-200" },
+          { label: t("profile.bestStreak"), value: t("common.dayShort", { n: profile.longest_streak }), icon: "🏆", color: "text-purple-500", tile: "bg-purple-50 border-purple-200" },
+          { label: t("profile.hearts"), value: `${calcCurrentHearts(profile.hearts, profile.hearts_updated_at)}/${MAX_HEARTS}`, icon: "❤️", color: "text-red-500", tile: "bg-red-50 border-red-200" },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
-            <p className="text-2xl mb-1">{stat.icon}</p>
-            <p className={`text-xl font-black ${stat.color}`}>{stat.value}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{stat.label}</p>
+          <div key={stat.label} className="px-2 flex flex-col items-center text-center">
+            <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center text-lg border-2 mb-1.5", stat.tile)} aria-hidden="true">
+              {stat.icon}
+            </div>
+            <p className={cn("font-display text-xl tabular-nums leading-tight", stat.color)}>{stat.value}</p>
+            <p className="text-[11px] font-extrabold text-gray-500 mt-0.5 leading-tight">{stat.label}</p>
           </div>
         ))}
       </div>
 
+      {/* Cosmetics won from guardians */}
+      <CollectionPanel />
+
       {/* Achievements */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div className="game-panel p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-gray-900">Achievements</h2>
-          <Button variant="ghost" size="sm">View All</Button>
+          <h2 className="text-lg text-gray-900"><span aria-hidden="true">🏅 </span>{t("profile.achievements")}</h2>
+          <Button variant="secondary" size="sm" className="rounded-2xl">{t("common.viewAll")}</Button>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {displayedAchievements.map((ach) => (
-            <div key={ach.slug} className="flex flex-col items-center gap-1 p-3 rounded-xl bg-gray-50">
-              <span className="text-3xl">{ach.icon}</span>
-              <p className="text-xs font-bold text-gray-700 text-center leading-tight">{ach.title}</p>
-              <p className="text-[10px] text-amber-500 font-bold">+{ach.xp_reward} XP</p>
+            <div key={ach.slug} className="flex flex-col items-center gap-1 p-3 rounded-xl bg-amber-50 border-2 border-amber-200">
+              <span className="text-3xl drop-shadow-sm">{ach.icon}</span>
+              <p className="text-xs font-extrabold text-gray-700 text-center leading-tight">{ach.title}</p>
+              <p className="text-[10px] text-amber-600 font-black tabular-nums bg-white rounded-full px-2 py-0.5 border border-amber-200">+{ach.xp_reward} XP</p>
             </div>
           ))}
         </div>
@@ -374,15 +400,20 @@ export default function ProfilePage() {
 
       {/* Learning goal */}
       {profile.learning_goal && (
-        <div className="bg-orange-50 rounded-2xl border border-orange-100 p-5">
-          <h2 className="font-bold text-orange-900 mb-1">Learning Goal</h2>
-          <p className="text-orange-700 capitalize text-sm">
-            {profile.learning_goal === "travel" && "🌏 Learning Thai for Travel"}
-            {profile.learning_goal === "work" && "💼 Learning Thai for Work"}
-            {profile.learning_goal === "study" && "📚 Learning Thai for Study"}
-            {profile.learning_goal === "fluency" && "🎯 Aiming for Full Fluency"}
-          </p>
-          <p className="text-orange-500 text-xs mt-1">Daily goal: {profile.daily_goal_minutes} minutes</p>
+        <div className="flex items-center gap-4 px-1">
+          <div className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center text-2xl border-2 bg-orange-50 border-orange-200" aria-hidden="true">
+            🎯
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg text-gray-900 leading-tight">{t("profile.learningGoalTitle")}</h2>
+            <p className="text-orange-600 font-extrabold capitalize text-sm">
+              {profile.learning_goal === "travel" && t("profile.goalTravel")}
+              {profile.learning_goal === "work" && t("profile.goalWork")}
+              {profile.learning_goal === "study" && t("profile.goalStudy")}
+              {profile.learning_goal === "fluency" && t("profile.goalFluency")}
+            </p>
+            <p className="text-[11px] font-extrabold text-gray-500 mt-0.5"><span aria-hidden="true">⏱️ </span>{t("profile.dailyGoalMinutes", { n: profile.daily_goal_minutes })}</p>
+          </div>
         </div>
       )}
     </div>

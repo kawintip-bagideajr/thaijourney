@@ -6,7 +6,7 @@ export const WEATHER_VOCAB: ActiveExercise[] = [
     instruction: "ร้อน = ?",
     question: "ร้อน", thaiText: "ร้อน", romanization: "ron",
     options: { choices: [{ id: "a", text: "cold" }, { id: "b", text: "hot" }, { id: "c", text: "rainy" }, { id: "d", text: "windy" }] },
-    correctAnswer: "b", explanation: "ร้อน (ron) = hot. Thailand is famous for its ร้อน weather!",
+    correctAnswer: "b", explanation: "ร้อน (ron) = hot. You'll say this a lot in Thailand.",
   },
   {
     id: "wea-mc-2", type: "multiple_choice",

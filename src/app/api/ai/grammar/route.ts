@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: "openai/gpt-oss-20b:free",
         max_tokens: 400,
+        response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
@@ -70,15 +71,24 @@ JSON format:
     }
 
     const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-    const content = (data.choices?.[0]?.message?.content ?? "").trim();
+    const raw = (data.choices?.[0]?.message?.content ?? "").trim();
+
+    // Strip markdown code fences (```json ... ``` or ``` ... ```)
+    const content = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("Grammar: could not parse JSON from:", content.slice(0, 200));
+      console.error("Grammar: could not parse JSON from:", raw.slice(0, 300));
       return NextResponse.json({ error: "Could not parse AI response" }, { status: 502 });
     }
 
-    const result = JSON.parse(jsonMatch[0]);
+    let result: unknown;
+    try {
+      result = JSON.parse(jsonMatch[0]);
+    } catch {
+      console.error("Grammar: JSON.parse failed on:", jsonMatch[0].slice(0, 200));
+      return NextResponse.json({ error: "Could not parse AI response" }, { status: 502 });
+    }
     return NextResponse.json(result);
   } catch (error) {
     console.error("Grammar API error:", error);

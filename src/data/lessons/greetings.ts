@@ -34,7 +34,7 @@ export const GREETINGS_EXERCISES: ActiveExercise[] = [
       ],
     },
     correctAnswer: "b",
-    explanation: "สวัสดี is used for both hello and goodbye in Thai — it's a blessing for well-being.",
+    explanation: "สวัสดี means both hello and goodbye. It's a wish for the other person's well-being.",
   },
   {
     id: "greet-mc-2",
@@ -78,7 +78,7 @@ export const GREETINGS_EXERCISES: ActiveExercise[] = [
       ],
     },
     correctAnswer: { "1": "Hello / Goodbye", "2": "Thank you", "3": "Sorry / Excuse me", "4": "Never mind / You're welcome" },
-    explanation: "These are the four most essential Thai social phrases.",
+    explanation: "You'll use these four phrases in almost every conversation.",
   },
   {
     id: "greet-drag-1",

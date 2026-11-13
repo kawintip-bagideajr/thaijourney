@@ -3,167 +3,157 @@ import { motion } from "framer-motion";
 import { Check, X, Crown, Bot, BookMarked, MessageCircle, Lock, Zap } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { cn } from "@/lib/utils";
-
-const FREE_FEATURES = [
-  { label: "All lesson modules (Beginner–Advanced)", ok: true },
-  { label: "Adventure Map & Province Lessons", ok: true },
-  { label: "Achievements & Leaderboard", ok: true },
-  { label: "Thai Alphabet practice", ok: true },
-  { label: "Daily streak & XP system", ok: true },
-  { label: "Kru AI Chat tutor", ok: false },
-  { label: "Grammar Checker", ok: false },
-  { label: "AI Dictionary lookups", ok: false },
-];
-
-const PRO_FEATURES = [
-  { label: "Everything in Free", ok: true },
-  { label: "Kru AI Chat — unlimited Thai tutoring", ok: true },
-  { label: "AI Grammar Checker for Thai sentences", ok: true },
-  { label: "Smart AI Dictionary with examples", ok: true },
-  { label: "Priority support", ok: true },
-];
 
 export default function PricingPage() {
   const profile = useAuthStore((s) => s.profile);
   const isPro = profile?.access_tier === "pro";
+  const { t } = useTranslation();
+
+  const FREE_FEATURES = [
+    { label: t("pricing.feature1"), ok: true },
+    { label: t("pricing.feature2"), ok: true },
+    { label: t("pricing.feature3"), ok: true },
+    { label: t("pricing.feature4"), ok: true },
+    { label: t("pricing.feature5"), ok: true },
+    { label: t("pricing.feature6"), ok: false },
+    { label: t("pricing.feature7"), ok: false },
+    { label: t("pricing.feature8"), ok: false },
+  ];
+
+  const PRO_FEATURES = [
+    { label: t("pricing.proAllFree"), ok: true },
+    { label: t("pricing.proChat"), ok: true },
+    { label: t("pricing.proGrammar"), ok: true },
+    { label: t("pricing.proDict"), ok: true },
+    { label: t("pricing.proSupport"), ok: true },
+  ];
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6 pb-28 space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className="w-16 h-16 gradient-thai rounded-2xl flex items-center justify-center mx-auto mb-4"
-        >
-          <Crown size={28} className="text-white" />
-        </motion.div>
-        <h1 className="text-2xl font-black text-gray-900">Choose Your Plan</h1>
-        <p className="text-gray-500 text-sm mt-1">Free forever or unlock AI features with Pro</p>
-      </div>
+    <div className="max-w-lg mx-auto px-4 py-6 pb-28 space-y-5">
+      {/* Hero: the Pro plan card carries the page heading */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="game-card !rounded-[2rem] p-6 relative overflow-hidden !border-orange-300 !shadow-[0_6px_0_#fdba74]"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="font-display text-2xl sm:text-3xl text-gray-900 leading-tight">{t("pricing.choosePlan")}</h1>
+            <p className="text-sm font-bold text-gray-500 mt-1">{t("pricing.subtitle")}</p>
+          </div>
+          <span className="btn-3d inline-flex items-center gap-1 bg-orange-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shrink-0 [--btn-edge:#c2410c]">
+            <Crown size={11} aria-hidden="true" /> PRO
+          </span>
+        </div>
 
-      {/* Tier cards */}
-      <div className="grid grid-cols-1 gap-4">
-        {/* Free */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            "bg-white rounded-2xl border p-5",
-            !isPro ? "border-gray-200" : "border-gray-100 opacity-60"
-          )}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-black text-gray-900">Free</h2>
-              <p className="text-xs text-gray-400">No cost, always available</p>
-            </div>
-            <div className="text-right">
-              <span className="text-2xl font-black text-gray-400">$0</span>
-              <p className="text-[10px] text-gray-400">forever</p>
-            </div>
+        <div className="mt-5 flex items-end justify-between gap-3 flex-wrap">
+          <div className="min-w-0">
+            <h2 className="font-display text-lg text-gray-900 leading-tight">✨ {t("pricing.pro")}</h2>
+            <p className="text-xs font-extrabold text-gray-500">{t("pricing.fullAi")}</p>
           </div>
-          <div className="space-y-2">
-            {FREE_FEATURES.map((f, i) => (
-              <div key={i} className="flex items-center gap-2.5">
-                {f.ok
-                  ? <Check size={14} className="text-green-500 flex-shrink-0" />
-                  : <X size={14} className="text-gray-300 flex-shrink-0" />}
-                <span className={cn("text-sm", f.ok ? "text-gray-700" : "text-gray-300 line-through")}>
-                  {f.label}
-                </span>
-              </div>
-            ))}
-          </div>
-          {!isPro && (
-            <div className="mt-4 py-2 text-center text-xs font-bold text-green-600 bg-green-50 rounded-xl">
-              ✓ Your current plan
+          <div className="text-right">
+            <div className="flex items-baseline gap-1 justify-end">
+              <span className="font-display text-5xl text-orange-500 tabular-nums leading-none">$5</span>
+              <span className="text-sm font-extrabold text-gray-500">{t("pricing.perMonth")}</span>
             </div>
-          )}
-        </motion.div>
+            <p className="text-[11px] font-extrabold text-gray-500 mt-1">{t("pricing.approxBaht", { n: 175 })}</p>
+          </div>
+        </div>
 
-        {/* Pro */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl border-2 border-orange-400 p-5 relative overflow-hidden"
-        >
-          <div className="absolute top-3 right-3">
-            <span className="gradient-thai text-white text-[10px] font-black px-2 py-1 rounded-full">
-              PRO
-            </span>
-          </div>
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-black text-gray-900">Pro</h2>
-              <p className="text-xs text-gray-400">Full AI features</p>
+        <div className="space-y-2 my-5">
+          {PRO_FEATURES.map((f, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded-full flex items-center justify-center border-2 bg-orange-100 border-orange-300 shrink-0">
+                <Check size={13} strokeWidth={3} className="text-orange-600" />
+              </span>
+              <span className="text-sm font-bold text-gray-700">{f.label}</span>
             </div>
-            <div className="text-right">
-              <div className="flex items-baseline gap-0.5 justify-end">
-                <span className="text-xl font-black text-orange-500">$5</span>
-                <span className="text-sm text-gray-400 font-medium">/ month</span>
-              </div>
-              <p className="text-[10px] text-gray-400">≈ ฿175 / month</p>
-            </div>
+          ))}
+        </div>
+        {isPro ? (
+          <div className="py-2 text-center text-sm font-extrabold text-amber-600 bg-amber-50 border-2 border-amber-200 rounded-2xl">
+            👑 {t("pricing.youHavePro")}
           </div>
-          <div className="space-y-2 mb-5">
-            {PRO_FEATURES.map((f, i) => (
-              <div key={i} className="flex items-center gap-2.5">
-                <Check size={14} className="text-orange-500 flex-shrink-0" />
-                <span className="text-sm text-gray-700">{f.label}</span>
-              </div>
-            ))}
+        ) : (
+          <Link href="/subscribe">
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              className="btn-3d shimmer w-full h-14 rounded-2xl bg-orange-500 text-white font-display text-base flex items-center justify-center gap-2 [--btn-edge:#c2410c]"
+            >
+              <Zap size={18} className="fill-white" />
+              {t("pricing.subscribeBtn")}
+            </motion.button>
+          </Link>
+        )}
+      </motion.section>
+
+      {/* Free plan: secondary */}
+      <section className={cn("game-panel p-5", isPro && "opacity-60")}>
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <div className="min-w-0">
+            <h2 className="font-display text-base text-gray-900 leading-tight">🎒 {t("pricing.free")}</h2>
+            <p className="text-[11px] font-extrabold text-gray-500">{t("pricing.noCost")}</p>
           </div>
-          {isPro ? (
-            <div className="py-2 text-center text-xs font-bold text-amber-600 bg-amber-50 rounded-xl">
-              ⭐ You have Pro Access!
-            </div>
-          ) : (
-            <Link href="/subscribe">
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                className="w-full gradient-thai text-white font-black py-3.5 rounded-2xl text-sm flex items-center justify-center gap-2"
+          <div className="text-right shrink-0">
+            <span className="font-display text-2xl text-gray-400 tabular-nums">$0</span>
+            <p className="text-[11px] font-extrabold text-gray-500">{t("pricing.forever")}</p>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          {FREE_FEATURES.map((f, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <span
+                className={cn(
+                  "w-5 h-5 rounded-full flex items-center justify-center border-2 shrink-0",
+                  f.ok ? "bg-green-100 border-green-300" : "bg-gray-100 border-gray-200"
+                )}
               >
-                <Zap size={16} />
-                Subscribe to Pro — $5/month
-              </motion.button>
-            </Link>
-          )}
-        </motion.div>
-      </div>
+                {f.ok
+                  ? <Check size={11} strokeWidth={3} className="text-green-600" />
+                  : <X size={11} strokeWidth={3} className="text-gray-400" />}
+              </span>
+              <span className={cn("text-sm font-bold", f.ok ? "text-gray-700" : "text-gray-400 line-through")}>
+                {f.label}
+              </span>
+            </div>
+          ))}
+        </div>
+        {!isPro && (
+          <p className="mt-3 text-sm font-extrabold text-green-600">
+            ✅ {t("pricing.yourCurrentPlan")}
+          </p>
+        )}
+      </section>
 
       {/* AI Features showcase */}
-      <div className="space-y-3">
-        <h3 className="font-bold text-gray-700 text-sm px-1">What Pro unlocks:</h3>
-        {[
-          { icon: Bot, title: "Kru AI Chat", desc: "Chat with your personal Thai tutor 24/7. Ask anything about Thai language and culture.", color: "text-purple-500", bg: "bg-purple-50" },
-          { icon: BookMarked, title: "AI Dictionary", desc: "Instant Thai word lookup with pronunciation, usage examples, and cultural context.", color: "text-blue-500", bg: "bg-blue-50" },
-          { icon: MessageCircle, title: "Grammar Checker", desc: "Type any Thai sentence and get instant corrections with explanations.", color: "text-green-500", bg: "bg-green-50" },
-        ].map((item, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 + i * 0.08 }}
-            className="flex items-start gap-3 p-4 bg-white border border-gray-100 rounded-2xl"
-          >
-            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", item.bg)}>
-              <item.icon size={18} className={item.color} />
+      <section className="space-y-2">
+        <h3 className="font-display text-lg text-gray-900 px-1">🔓 {t("pricing.whatProUnlocks")}</h3>
+        <div className="game-panel game-rows px-4">
+          {[
+            { icon: Bot, title: t("pricing.kruChatTitle"), desc: t("pricing.kruChatDesc"), color: "text-purple-500", bg: "bg-purple-50 border-purple-200" },
+            { icon: BookMarked, title: t("pricing.aiDictTitle"), desc: t("pricing.aiDictDesc"), color: "text-sky-500", bg: "bg-sky-50 border-sky-200" },
+            { icon: MessageCircle, title: t("pricing.grammarTitle"), desc: t("pricing.grammarDesc"), color: "text-green-500", bg: "bg-green-50 border-green-200" },
+          ].map((item, i) => (
+            <div key={i} className="py-3.5 flex items-start gap-3">
+              <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center border-2 shrink-0", item.bg)}>
+                <item.icon size={18} className={item.color} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-extrabold text-gray-900 text-sm">{item.title}</p>
+                <p className="text-xs font-bold text-gray-500 mt-0.5">{item.desc}</p>
+              </div>
+              {!isPro && (
+                <Lock size={14} className="text-gray-400 shrink-0 mt-1" />
+              )}
             </div>
-            <div>
-              <p className="font-bold text-gray-900 text-sm">{item.title}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
-            </div>
-            {!isPro && <Lock size={12} className="text-gray-300 mt-0.5 flex-shrink-0" />}
-          </motion.div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
 
-      <p className="text-center text-xs text-gray-400 px-4">
-        Cancel anytime. Pro activates within minutes of payment confirmation.
+      <p className="text-center text-xs font-bold text-gray-400 px-4">
+        {t("pricing.cancelNote")}
       </p>
     </div>
   );

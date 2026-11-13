@@ -12,8 +12,8 @@ export const TIME_VOCAB: ActiveExercise[] = [
     id: "time-mc-2", type: "multiple_choice",
     instruction: "สามโมงเช้า = ?",
     question: "สามโมงเช้า", thaiText: "สามโมงเช้า", romanization: "sam mong chao",
-    options: { choices: [{ id: "a", text: "3 PM" }, { id: "b", text: "3 AM (morning)" }, { id: "c", text: "3:30 AM" }, { id: "d", text: "13:00" }] },
-    correctAnswer: "b", explanation: "เช้า (chao) = morning. สามโมงเช้า = 3 in the morning (3 AM).",
+    options: { choices: [{ id: "a", text: "3 PM" }, { id: "b", text: "9 AM" }, { id: "c", text: "3 AM" }, { id: "d", text: "13:00" }] },
+    correctAnswer: "b", explanation: "Morning hours count from 6 AM: หกโมงเช้า is 6 AM, so สามโมงเช้า is the third hour after that, 9 AM. 3 AM is ตีสาม.",
   },
   {
     id: "time-mc-3", type: "multiple_choice",

@@ -24,7 +24,7 @@ export function StatsCard({ label, value, icon: Icon, color = "orange", trend, c
     <div className={cn("bg-white rounded-2xl border border-gray-100 shadow-sm p-5", className)}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{label}</p>
+          <p className="text-xs font-semibold text-gray-400 mb-2">{label}</p>
           <p className={cn("text-3xl font-black", c.text)}>{value}</p>
           {trend && (
             <p className={cn("text-xs mt-1 font-medium", trend.up ? "text-green-500" : "text-red-400")}>

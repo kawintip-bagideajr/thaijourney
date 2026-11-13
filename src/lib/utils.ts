@@ -53,7 +53,23 @@ export function getStreakEmoji(streak: number): string {
   return "⭐";
 }
 
-export function heartRefillTime(hearts: number, maxHearts = 5): string {
+export const MAX_HEARTS = 5;
+export const MS_PER_HEART = 30 * 60 * 1000; // 30 minutes
+
+export function calcCurrentHearts(hearts: number, heartsUpdatedAt: string): number {
+  if (hearts >= MAX_HEARTS) return MAX_HEARTS;
+  const elapsed = Date.now() - new Date(heartsUpdatedAt).getTime();
+  const refilled = Math.floor(elapsed / MS_PER_HEART);
+  return Math.min(MAX_HEARTS, hearts + refilled);
+}
+
+export function msToNextHeart(hearts: number, heartsUpdatedAt: string): number {
+  if (hearts >= MAX_HEARTS) return 0;
+  const elapsed = Date.now() - new Date(heartsUpdatedAt).getTime();
+  return MS_PER_HEART - (elapsed % MS_PER_HEART);
+}
+
+export function heartRefillTime(hearts: number, maxHearts = MAX_HEARTS): string {
   if (hearts >= maxHearts) return "Full";
   const minutesPerHeart = 30;
   const minutesLeft = (maxHearts - hearts) * minutesPerHeart;

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserFromSession, adminDb } from "@/lib/firebase/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { cookies } from "next/headers";
-import { levelFromXP } from "@/lib/utils";
+import { levelFromXP, calcCurrentHearts, MAX_HEARTS, MS_PER_HEART } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const user = await getUserFromSession(cookieStore.get("__session")?.value);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { lessonSlug, moduleSlug, xpEarned, mistakes, timeMs, heartSacrifice } = await req.json();
+    const { lessonSlug, moduleSlug, xpEarned, mistakes, timeMs, heartSacrifice, heartsLost } = await req.json();
     const userId = user.uid;
 
     // Get current profile
@@ -19,14 +19,29 @@ export async function POST(req: NextRequest) {
 
     const profile = profileDoc.data()!;
 
-    // Heart sacrifice: deduct 1 heart (only if user has hearts left)
-    const currentHearts = profile.hearts ?? 0;
-    if (heartSacrifice && currentHearts <= 0) {
+    // Calculate real current hearts (apply time-based refill)
+    const storedHearts = profile.hearts ?? 0;
+    const heartsUpdatedAt = profile.hearts_updated_at ?? new Date().toISOString();
+    const realHearts = calcCurrentHearts(storedHearts, heartsUpdatedAt);
+
+    // Heart sacrifice (replay): deduct 1 heart
+    if (heartSacrifice && realHearts <= 0) {
       return NextResponse.json({ error: "No hearts remaining" }, { status: 400 });
     }
-    if (heartSacrifice) {
+
+    // Calculate hearts after this lesson
+    const lostCount = heartSacrifice ? 1 : Math.min(heartsLost ?? 0, realHearts);
+    const newHearts = Math.max(0, realHearts - lostCount);
+    const heartsChanged = newHearts !== realHearts || storedHearts !== realHearts;
+
+    if (heartsChanged) {
+      // Compute the effective "hearts_updated_at" so refill timer is preserved correctly
+      const elapsed = Date.now() - new Date(heartsUpdatedAt).getTime();
+      const partialMs = elapsed % MS_PER_HEART;
+      const effectiveBase = new Date(Date.now() - partialMs).toISOString();
       await adminDb.collection("users").doc(userId).update({
-        hearts: Math.max(0, currentHearts - 1),
+        hearts: newHearts,
+        hearts_updated_at: effectiveBase,
         updated_at: new Date().toISOString(),
       });
     }
@@ -105,7 +120,7 @@ export async function POST(req: NextRequest) {
       newLevel,
       leveledUp,
       newStreak,
-      newHearts: heartSacrifice ? Math.max(0, currentHearts - 1) : currentHearts,
+      newHearts,
     });
   } catch (error) {
     console.error("Progress API error:", error);

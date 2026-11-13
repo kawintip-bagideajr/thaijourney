@@ -1,46 +1,58 @@
 "use client";
-import type { ThaiConsonant } from "@/data/alphabet";
-import { cn } from "@/lib/utils";
+import type { ThaiConsonant, ConsonantClass } from "@/data/alphabet";
 
 interface ConsonantCardProps {
   consonant: ThaiConsonant;
   onSelect: (consonant: ThaiConsonant) => void;
 }
 
-const classBg = {
-  high: "bg-blue-50 border-blue-200 hover:bg-blue-100",
-  mid: "bg-orange-50 border-orange-200 hover:bg-orange-100",
-  low: "bg-green-50 border-green-200 hover:bg-green-100",
-};
-
-const classText = {
-  high: "text-blue-700",
-  mid: "text-orange-700",
-  low: "text-green-700",
-};
-
-const classBadge = {
-  high: "bg-blue-200 text-blue-800",
-  mid: "bg-orange-200 text-orange-800",
-  low: "bg-green-200 text-green-800",
+const classConfig: Record<ConsonantClass, {
+  bg: string; border: string; edge: string; char: string; badgeBg: string; badgeText: string;
+}> = {
+  high: {
+    bg: "#f0f9ff",
+    border: "#bae6fd",
+    edge: "#7dd3fc",
+    char: "#0284c7",
+    badgeBg: "#e0f2fe",
+    badgeText: "#0369a1",
+  },
+  mid: {
+    bg: "#fff7ed",
+    border: "#fed7aa",
+    edge: "#fdba74",
+    char: "#ea580c",
+    badgeBg: "#ffedd5",
+    badgeText: "#c2410c",
+  },
+  low: {
+    bg: "#f0fdf4",
+    border: "#bbf7d0",
+    edge: "#86efac",
+    char: "#16a34a",
+    badgeBg: "#dcfce7",
+    badgeText: "#15803d",
+  },
 };
 
 export function ConsonantCard({ consonant, onSelect }: ConsonantCardProps) {
+  const cfg = classConfig[consonant.class];
   return (
     <button
       onClick={() => onSelect(consonant)}
-      className={cn(
-        "w-full aspect-[3/4] rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 shadow-sm",
-        classBg[consonant.class]
-      )}
+      style={{ background: cfg.bg, borderColor: cfg.border, ["--btn-edge" as string]: cfg.edge }}
+      className="btn-3d w-full aspect-[3/4] rounded-3xl border-2 flex flex-col items-center justify-center gap-1.5 transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
     >
-      <span className={cn("text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md", classBadge[consonant.class])}>
+      <span
+        style={{ background: cfg.badgeBg, color: cfg.badgeText }}
+        className="text-[9px] font-black capitalize px-2 py-0.5 rounded-full"
+      >
         {consonant.class}
       </span>
-      <span className={cn("text-5xl thai-text font-bold", classText[consonant.class])}>
+      <span style={{ color: cfg.char }} className="text-5xl thai-text font-bold leading-none drop-shadow-sm">
         {consonant.thai}
       </span>
-      <span className="text-xs font-semibold text-gray-500">{consonant.rtgs}</span>
+      <span className="text-[11px] font-extrabold text-gray-500">{consonant.rtgs}</span>
     </button>
   );
 }

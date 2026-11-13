@@ -13,7 +13,7 @@ export function LoadingSpinner({ size = "md", className, text }: LoadingSpinnerP
   return (
     <div className={cn("flex flex-col items-center justify-center gap-3", className)}>
       <div className={cn("animate-spin rounded-full border-orange-200 border-t-orange-500", sizeClass)} />
-      {text && <p className="text-sm text-gray-500 animate-pulse">{text}</p>}
+      {text && <p className="text-sm font-bold text-gray-500 animate-pulse">{text}</p>}
     </div>
   );
 }
@@ -39,17 +39,17 @@ export function PageLoader() {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-      <div className="text-center px-6">
-        <div className="text-5xl mb-4 animate-float">🇹🇭</div>
+    <div className="fixed inset-0 flex items-center justify-center bg-[#fff7e8] z-50">
+      <div className="game-card text-center px-8 py-7 mx-4 max-w-sm">
+        <div className="text-6xl mb-4" aria-hidden="true">🇹🇭</div>
         <LoadingSpinner size="lg" />
-        <p className="mt-4 text-gray-500 font-medium">กำลังโหลด...</p>
+        <p className="mt-4 font-display text-lg text-gray-700">กำลังโหลด...</p>
         {showRecovery && (
           <button
             onClick={handleReset}
-            className="mt-6 text-sm text-orange-500 underline"
+            className="btn-3d mt-6 px-4 py-2.5 rounded-2xl bg-white border-2 border-[var(--game-edge)] text-sm font-extrabold text-orange-600 [--btn-edge:var(--game-edge)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
           >
-            โหลดนานเกิน? คลิกที่นี่เพื่อล้างและเข้าสู่ระบบใหม่
+            โหลดนานผิดปกติ? กดตรงนี้เพื่อออกจากระบบแล้วเข้าใหม่
           </button>
         )}
       </div>

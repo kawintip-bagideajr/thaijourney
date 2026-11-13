@@ -32,14 +32,14 @@ export function LevelBadge({ level, size = "md", className }: LevelBadgeProps) {
   return (
     <div
       className={cn(
-        "rounded-full bg-gradient-to-br flex flex-col items-center justify-center font-black text-white shadow-lg",
+        "rounded-full bg-gradient-to-br flex flex-col items-center justify-center font-black text-white border-2 border-white/70 shadow-[0_3px_0_rgba(0,0,0,0.18)] [text-shadow:0_1px_0_rgba(0,0,0,0.2)] tabular-nums shrink-0",
         getLevelColor(level),
         sizeMap[size],
         className
       )}
     >
       <span className="leading-none">{level}</span>
-      {size !== "sm" && <span className="text-[8px] leading-none opacity-80">{getLevelEmoji(level)}</span>}
+      {size !== "sm" && <span className="text-[8px] leading-none opacity-90" aria-hidden="true">{getLevelEmoji(level)}</span>}
     </div>
   );
 }

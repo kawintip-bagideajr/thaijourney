@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicPaths = ["/", "/login", "/signup", "/forgot-password", "/api/auth", "/api/dictionary", "/api/ai"];
+const publicPaths = ["/", "/login", "/signup", "/forgot-password", "/api/auth", "/api/dictionary", "/api/ai", "/api/stripe/webhook"];
 
 export async function proxy(request: NextRequest) {
   const sessionCookie = request.cookies.get("__session")?.value;

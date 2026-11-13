@@ -4,30 +4,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, BookOpen, BookMarked, MessageCircle,
-  Map, Trophy, Star, User, Settings, LogOut,
+  BookMarked,
+  Trophy, Star, User, Settings, LogOut,
   MoreHorizontal, X, Flame, Crown, Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const MAIN_NAV = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-  { href: "/learn", icon: BookOpen, label: "Learn" },
-  { href: "/dictionary", icon: BookMarked, label: "Dict" },
-  { href: "/chat", icon: MessageCircle, label: "AI" },
+  { href: "/dashboard", emoji: "🏠", key: "nav.home" },
+  { href: "/learn", emoji: "📚", key: "nav.learn" },
+  { href: "/map", emoji: "🗺️", key: "nav.map" },
+  { href: "/chat", emoji: "💬", key: "nav.ai" },
 ];
 
 const MORE_NAV = [
-  { href: "/map", icon: Map, label: "Map" },
-  { href: "/leaderboard", icon: Trophy, label: "Leaderboard" },
-  { href: "/alphabet", icon: Star, label: "Alphabet" },
-  { href: "/achievements", icon: Flame, label: "Badges" },
-  { href: "/profile", icon: User, label: "Profile" },
-  { href: "/subscribe", icon: Crown, label: "Pro" },
-  { href: "/donate", icon: Heart, label: "Donate" },
-  { href: "/settings", icon: Settings, label: "Settings" },
+  { href: "/dictionary", icon: BookMarked, key: "nav.dictionary" },
+  { href: "/leaderboard", icon: Trophy, key: "nav.leaderboard" },
+  { href: "/alphabet", icon: Star, key: "nav.alphabet" },
+  { href: "/achievements", icon: Flame, key: "nav.achievements" },
+  { href: "/profile", icon: User, key: "nav.profile" },
+  { href: "/subscribe", icon: Crown, key: "common.pro" },
+  { href: "/donate", icon: Heart, key: "nav.donate" },
+  { href: "/settings", icon: Settings, key: "nav.settings" },
 ];
 
 export function BottomNav() {
@@ -35,6 +36,7 @@ export function BottomNav() {
   const [showMore, setShowMore] = useState(false);
   const { signOut } = useAuth();
   const profile = useAuthStore((s) => s.profile);
+  const { t } = useTranslation();
 
   if (pathname.includes("/lesson/")) return null;
 
@@ -76,7 +78,7 @@ export function BottomNav() {
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 pb-4">
-              <p className="font-black text-gray-900">More</p>
+              <p className="font-black text-gray-900">{t("nav.more")}</p>
               <button
                 onClick={() => setShowMore(false)}
                 className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"
@@ -87,7 +89,7 @@ export function BottomNav() {
 
             {/* Grid of extra nav items */}
             <div className="grid grid-cols-4 gap-2 px-4 pb-4">
-              {MORE_NAV.map(({ href, icon: Icon, label }) => {
+              {MORE_NAV.map(({ href, icon: Icon, key }) => {
                 const isActive = pathname === href || pathname.startsWith(href + "/");
                 return (
                   <Link
@@ -109,7 +111,7 @@ export function BottomNav() {
                       "text-[10px] font-semibold text-center leading-tight",
                       isActive ? "text-orange-500" : "text-gray-600"
                     )}>
-                      {label}
+                      {t(key)}
                     </span>
                   </Link>
                 );
@@ -123,7 +125,7 @@ export function BottomNav() {
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-500 font-semibold text-sm"
               >
                 <LogOut size={16} />
-                Sign Out
+                {t("nav.signOut")}
               </button>
             </div>
           </motion.div>
@@ -132,29 +134,25 @@ export function BottomNav() {
 
       {/* Bottom navigation bar */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40"
+        className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[var(--game-edge)] z-40"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <div className="flex items-center justify-around px-1 pt-1 pb-1">
-          {MAIN_NAV.map(({ href, icon: Icon, label }) => {
+          {MAIN_NAV.map(({ href, emoji, key }) => {
             const isActive = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link key={href} href={href} className="flex flex-col items-center gap-0.5 flex-1 py-0.5">
                 <div className={cn(
-                  "w-10 h-10 flex items-center justify-center rounded-xl transition-colors",
-                  isActive ? "bg-orange-100" : ""
+                  "w-11 h-10 flex items-center justify-center rounded-2xl border-2 transition-all text-xl",
+                  isActive ? "bg-orange-50 border-orange-300 shadow-[0_3px_0_#fdba74] -translate-y-0.5" : "!border-transparent grayscale-[40%] opacity-80"
                 )}>
-                  <Icon
-                    size={20}
-                    className={cn(isActive ? "text-orange-500" : "text-gray-400")}
-                    strokeWidth={isActive ? 2.5 : 1.8}
-                  />
+                  {emoji}
                 </div>
                 <span className={cn(
-                  "text-[9px] font-semibold leading-none",
+                  "text-[10px] font-extrabold leading-none",
                   isActive ? "text-orange-500" : "text-gray-400"
                 )}>
-                  {label}
+                  {t(key)}
                 </span>
               </Link>
             );
@@ -179,7 +177,7 @@ export function BottomNav() {
               "text-[9px] font-semibold leading-none",
               (showMore || isMoreActive) ? "text-orange-500" : "text-gray-400"
             )}>
-              More
+              {t("nav.more")}
             </span>
           </button>
         </div>

@@ -37,6 +37,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const setProfile = useAuthStore((s) => s.setProfile);
   const theme = useSettingsStore((s) => s.theme);
+  const darkAccent = useSettingsStore((s) => s.darkAccent);
+  const language = useSettingsStore((s) => s.language);
   const router = useRouter();
   const pathname = usePathname();
   const isLesson = pathname.includes("/lesson/");
@@ -44,8 +46,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("theme-sakura", "theme-ocean", "theme-forest", "theme-dark");
+    root.classList.remove("dark-accent-indigo", "dark-accent-teal", "dark-accent-emerald", "dark-accent-rose", "dark-accent-sky");
     if (theme !== "light") root.classList.add(`theme-${theme}`);
-  }, [theme]);
+    if (theme === "dark") root.classList.add(`dark-accent-${darkAccent}`);
+  }, [theme, darkAccent]);
+
+  // Apply the selected app language to the document (accessibility + browser behaviour)
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   // Safety net: if Firebase Auth never resolves within 8s, force full sign-out + redirect
   useEffect(() => {
@@ -82,7 +91,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   if (FIREBASE_CONFIGURED && !profile) return <PageLoader />;
 
   return (
-    <div className="flex min-h-dvh bg-gray-50 overflow-x-hidden">
+    <div className="app-cute flex min-h-dvh bg-gray-50 overflow-x-hidden">
       <Sidebar />
       <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
         <TopBar />

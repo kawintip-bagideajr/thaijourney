@@ -1,8 +1,11 @@
+"use client";
 import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 export const dynamic = "force-dynamic";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex overflow-x-hidden">
       {/* Left: decorative panel (desktop only) */}
@@ -13,8 +16,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
           <h1 className="text-4xl font-black mb-4">ThaiJN</h1>
           <p className="text-xl opacity-90 mb-8">
-            Unlock Thailand through language.<br />
-            Start your adventure today.
+            {t("auth.tagline1")}<br />
+            {t("auth.tagline2")}
           </p>
           <div className="grid grid-cols-3 gap-4 text-center">
             {[

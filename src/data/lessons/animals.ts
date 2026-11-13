@@ -6,7 +6,7 @@ export const ANIMALS_VOCAB: ActiveExercise[] = [
     instruction: "ช้าง = ?",
     question: "ช้าง", thaiText: "ช้าง", romanization: "chang",
     options: { choices: [{ id: "a", text: "tiger" }, { id: "b", text: "monkey" }, { id: "c", text: "elephant" }, { id: "d", text: "snake" }] },
-    correctAnswer: "c", explanation: "ช้าง (chang) = elephant — Thailand's national symbol! The white elephant is especially sacred.",
+    correctAnswer: "c", explanation: "ช้าง (chang) = elephant, Thailand's national animal. White elephants are especially sacred.",
   },
   {
     id: "ani-mc-2", type: "multiple_choice",
@@ -20,7 +20,7 @@ export const ANIMALS_VOCAB: ActiveExercise[] = [
     instruction: "แมว = ?",
     question: "แมว", thaiText: "แมว", romanization: "maeo",
     options: { choices: [{ id: "a", text: "dog" }, { id: "b", text: "bird" }, { id: "c", text: "cat" }, { id: "d", text: "rabbit" }] },
-    correctAnswer: "c", explanation: "แมว (maeo) = cat. The Siamese cat (วิเชียรมาศ) is a famous Thai breed!",
+    correctAnswer: "c", explanation: "แมว (maeo) = cat. The Siamese cat (วิเชียรมาศ) is a famous Thai breed.",
   },
   {
     id: "ani-match-1", type: "match_pairs",
@@ -35,14 +35,14 @@ export const ANIMALS_VOCAB: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "ปลา (fish) is a huge part of Thai cuisine. หมา = informal word for dog.",
+    explanation: "ปลา (fish) shows up in a lot of Thai food. หมา is the casual word for dog.",
   },
   {
     id: "ani-mc-4", type: "multiple_choice",
     instruction: "กบ = ?",
     question: "กบ", thaiText: "กบ", romanization: "gop",
     options: { choices: [{ id: "a", text: "frog" }, { id: "b", text: "crab" }, { id: "c", text: "turtle" }, { id: "d", text: "shrimp" }] },
-    correctAnswer: "a", explanation: "กบ (gop) = frog. Thailand has delicious frog dishes! กุ้ง (kung) = shrimp.",
+    correctAnswer: "a", explanation: "กบ (gop) = frog. You'll find frog on plenty of Thai menus. กุ้ง (kung) = shrimp.",
   },
 ];
 
@@ -52,7 +52,7 @@ export const NATURE_VOCAB: ActiveExercise[] = [
     instruction: "ทะเล = ?",
     question: "ทะเล", thaiText: "ทะเล", romanization: "tha-le",
     options: { choices: [{ id: "a", text: "river" }, { id: "b", text: "mountain" }, { id: "c", text: "sea / ocean" }, { id: "d", text: "waterfall" }] },
-    correctAnswer: "c", explanation: "ทะเล (tha-le) = sea/ocean. ไปทะเล = going to the sea. Thailand's beaches are world-famous!",
+    correctAnswer: "c", explanation: "ทะเล (tha-le) = sea/ocean. ไปทะเล = go to the sea, which is how Thais say they're off to the beach.",
   },
   {
     id: "nat-mc-2", type: "multiple_choice",
@@ -81,7 +81,7 @@ export const NATURE_VOCAB: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "เกาะ = island — used in many famous names: เกาะสมุย (Koh Samui), เกาะพีพี (Koh Phi Phi).",
+    explanation: "เกาะ = island. You'll see it in lots of place names: เกาะสมุย (Koh Samui), เกาะพีพี (Koh Phi Phi).",
   },
   {
     id: "nat-mc-4", type: "multiple_choice",

@@ -43,3 +43,6 @@ next-env.d.ts
 .vercel
 
 .env.local
+
+# local tool caches
+/.taste-skill/

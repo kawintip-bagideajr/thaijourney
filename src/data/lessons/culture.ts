@@ -4,11 +4,11 @@ export const THAI_CUSTOMS: ActiveExercise[] = [
   {
     id: "cust-mc-1", type: "multiple_choice",
     instruction: "ไหว้ is used for what?",
-    question: "ไหว้ (wai) — what is this gesture?",
+    question: "ไหว้ (wai): what is this gesture?",
     options: {
       choices: [
         { id: "a", text: "A handshake" },
-        { id: "b", text: "A bow with hands pressed together — Thai greeting" },
+        { id: "b", text: "A Thai greeting: a small bow with palms pressed together" },
         { id: "c", text: "Pointing at someone" },
         { id: "d", text: "A wave goodbye" },
       ],
@@ -42,7 +42,7 @@ export const THAI_CUSTOMS: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "สงกรานต์ is celebrated in April with water splashing — Thailand's biggest festival.",
+    explanation: "สงกรานต์ is celebrated in April with water splashing. It's Thailand's biggest festival.",
   },
   {
     id: "cust-mc-4", type: "multiple_choice",
@@ -52,11 +52,11 @@ export const THAI_CUSTOMS: ActiveExercise[] = [
       choices: [
         { id: "a", text: "Anything is fine" },
         { id: "b", text: "Shorts and sleeveless tops" },
-        { id: "c", text: "Modest clothing — shoulders and knees covered" },
+        { id: "c", text: "Modest clothing that covers shoulders and knees" },
         { id: "d", text: "Traditional Thai silk only" },
       ],
     },
-    correctAnswer: "c", explanation: "Thai temples require modest dress — cover shoulders and knees. Some temples provide sarongs.",
+    correctAnswer: "c", explanation: "Thai temples ask for modest dress: cover your shoulders and knees. Some temples lend sarongs at the entrance.",
   },
 ];
 
@@ -80,7 +80,7 @@ export const THAI_FESTIVALS: ActiveExercise[] = [
     instruction: "ทำบุญ = ?",
     question: "ทำบุญ", thaiText: "ทำบุญ", romanization: "tham bun",
     options: { choices: [{ id: "a", text: "go to market" }, { id: "b", text: "make merit / do good deeds" }, { id: "c", text: "celebrate a birthday" }, { id: "d", text: "pray at home" }] },
-    correctAnswer: "b", explanation: "ทำบุญ (tham bun) = make merit. Thais do this regularly at temples — giving food to monks.",
+    correctAnswer: "b", explanation: "ทำบุญ (tham bun) = make merit. Thais often do this at temples, for example by giving food to monks.",
   },
   {
     id: "fest-match-1", type: "match_pairs",
@@ -88,7 +88,7 @@ export const THAI_FESTIVALS: ActiveExercise[] = [
     question: "Match each festival to its description",
     options: {
       pairs: [
-        { id: "1", thai: "สงกรานต์", english: "Thai New Year — water festival" },
+        { id: "1", thai: "สงกรานต์", english: "Thai New Year, the water festival" },
         { id: "2", thai: "ลอยกระทง", english: "Full moon floating baskets" },
         { id: "3", thai: "วันมาฆบูชา", english: "Buddhist holy day" },
         { id: "4", thai: "ตรุษจีน (trut jin)", english: "Chinese New Year" },

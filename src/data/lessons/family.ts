@@ -35,7 +35,7 @@ export const FAMILY_VOCAB: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "Thai distinguishes paternal (ปู่/ย่า) and maternal (ตา/ยาย) grandparents.",
+    explanation: "Thai has different words for grandparents on your dad's side (ปู่/ย่า) and your mom's side (ตา/ยาย).",
   },
   {
     id: "fam-mc-4", type: "multiple_choice",

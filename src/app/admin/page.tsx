@@ -19,7 +19,7 @@ export default function AdminDashboard() {
     <div className="p-8 space-y-8">
       <div>
         <h1 className="text-2xl font-black text-white">Admin Dashboard</h1>
-        <p className="text-gray-400 text-sm mt-1">Platform overview and key metrics</p>
+        <p className="text-gray-400 text-sm mt-1">How the platform is doing</p>
       </div>
 
       {/* Stats */}

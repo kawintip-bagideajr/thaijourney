@@ -12,9 +12,8 @@ interface ProgressBarProps {
 }
 
 const colorMap = {
-  orange: "from-orange-400 to-amber-400",
-  green: "from-green-400 to-emerald-400",
-  blue: "from-blue-400 to-cyan-400",
+  green:  "from-green-400 to-emerald-400",
+  blue:   "from-blue-400 to-cyan-400",
   purple: "from-purple-400 to-violet-400",
 };
 
@@ -29,9 +28,14 @@ export function ProgressBar({
   const pct = Math.min(100, Math.max(0, (value / max) * 100));
 
   return (
-    <div className={cn("relative h-3 w-full overflow-hidden rounded-full bg-gray-100", className)}>
+    <div className={cn("relative h-4 w-full overflow-hidden rounded-full bg-gray-200/80 shadow-inner", className)}>
       <motion.div
-        className={cn("h-full rounded-full bg-gradient-to-r", colorMap[color])}
+        className={cn(
+          "h-full rounded-full",
+          color === "orange"
+            ? "xp-bar"
+            : `bg-gradient-to-r ${colorMap[color as keyof typeof colorMap]}`
+        )}
         initial={animated ? { width: 0 } : { width: `${pct}%` }}
         animate={{ width: `${pct}%` }}
         transition={{ duration: 0.6, ease: "easeOut" }}

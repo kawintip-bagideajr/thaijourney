@@ -93,7 +93,7 @@ export function ThailandMap({ unlockedProvinceIds, userXP, onProvinceClick }: Th
               {/* Glow ring for unlocked */}
               {isUnlocked && (
                 <div
-                  className="absolute inset-0 rounded-full animate-pulse"
+                  className="absolute inset-0 rounded-full"
                   style={{
                     background: province.color,
                     filter: "blur(10px)",
@@ -106,7 +106,7 @@ export function ThailandMap({ unlockedProvinceIds, userXP, onProvinceClick }: Th
               {/* Can-unlock pulse ring */}
               {canUnlock && (
                 <div
-                  className="absolute inset-0 rounded-full animate-ping"
+                  className="absolute inset-0 rounded-full"
                   style={{
                     border: "2px solid #F59E0B",
                     opacity: 0.5,

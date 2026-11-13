@@ -13,20 +13,9 @@ import { doc, setDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const DEMO_MODE = !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-
-const signupSchema = z.object({
-  username: z.string().min(3, "At least 3 characters").max(20).regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores"),
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(8, "At least 8 characters").regex(/[A-Z]/, "Include an uppercase letter").regex(/[0-9]/, "Include a number"),
-  confirmPassword: z.string(),
-}).refine((d) => d.password === d.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type SignupForm = z.infer<typeof signupSchema>;
 
 async function createSession(idToken: string) {
   const res = await fetch("/api/auth/session", {
@@ -66,6 +55,18 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const signupSchema = z.object({
+    username: z.string().min(3, t("auth.zodUsernameMin")).max(20).regex(/^[a-zA-Z0-9_]+$/, t("auth.zodUsernameChars")),
+    email: z.string().email(t("auth.zodEmail")),
+    password: z.string().min(8, t("auth.zodPasswordMin8")).regex(/[A-Z]/, t("auth.zodPasswordUpper")).regex(/[0-9]/, t("auth.zodPasswordNum")),
+    confirmPassword: z.string(),
+  }).refine((d) => d.password === d.confirmPassword, {
+    message: t("auth.zodPasswordMatch"),
+    path: ["confirmPassword"],
+  });
+  type SignupForm = z.infer<typeof signupSchema>;
 
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -86,15 +87,15 @@ export default function SignupPage() {
     } catch (e: unknown) {
       const code = (e as { code?: string }).code ?? "";
       if (code.includes("email-already-in-use")) {
-        setError("This email is already registered. Try 'Continue with Google' or sign in with your password.");
+        setError(t("auth.errEmailExists"));
       } else if (code.includes("weak-password")) {
-        setError("Password is too weak. Use at least 8 characters with an uppercase letter and a number.");
+        setError(t("auth.errWeak"));
       } else if (code.includes("invalid-email")) {
-        setError("Please enter a valid email address.");
+        setError(t("auth.errValidEmail"));
       } else if (code.includes("operation-not-allowed")) {
-        setError("Email sign-up is not available. Please use 'Continue with Google'.");
+        setError(t("auth.errSignupNotAllowed"));
       } else {
-        setError("Sign up failed. Please try again.");
+        setError(t("auth.errSignupFailed"));
       }
     }
   };
@@ -109,14 +110,14 @@ export default function SignupPage() {
       await createSession(idToken);
       router.push("/dashboard");
     } catch {
-      setError("Google sign up failed. Please try again.");
+      setError(t("auth.errGoogleSignup"));
     }
   };
 
   const strengthChecks = [
-    { label: "8+ characters", pass: password.length >= 8 },
-    { label: "Uppercase letter", pass: /[A-Z]/.test(password) },
-    { label: "Number", pass: /[0-9]/.test(password) },
+    { label: t("auth.strength8"), pass: password.length >= 8 },
+    { label: t("auth.strengthUpper"), pass: /[A-Z]/.test(password) },
+    { label: t("auth.strengthNum"), pass: /[0-9]/.test(password) },
   ];
 
   return (
@@ -126,8 +127,8 @@ export default function SignupPage() {
           <AppLogoIcon size={32} />
           <span className="font-black text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">ThaiJN</span>
         </Link>
-        <h1 className="text-3xl font-black text-gray-900">Start your journey</h1>
-        <p className="text-gray-500 mt-1">Free forever. No credit card needed.</p>
+        <h1 className="text-3xl font-black text-gray-900">{t("auth.startJourney")}</h1>
+        <p className="text-gray-500 mt-1">{t("auth.freeForever")}</p>
       </div>
 
       <button
@@ -141,27 +142,27 @@ export default function SignupPage() {
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
-        Continue with Google
+        {t("auth.continueGoogle")}
       </button>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
-        <div className="relative flex justify-center text-xs text-gray-400 uppercase"><span className="bg-white px-2">or</span></div>
+        <div className="relative flex justify-center text-xs text-gray-400 uppercase"><span className="bg-white px-2">{t("auth.or")}</span></div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
-          <Input placeholder="yourname" {...register("username")} />
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("auth.username")}</label>
+          <Input placeholder={t("auth.usernamePh")} {...register("username")} />
           {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
-          <Input type="email" placeholder="you@example.com" {...register("email")} />
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("auth.email")}</label>
+          <Input type="email" placeholder={t("auth.emailPh")} {...register("email")} />
           {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("auth.password")}</label>
           <div className="relative">
             <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...register("password")} className="pr-11" />
             <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -180,7 +181,7 @@ export default function SignupPage() {
           )}
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm Password</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("auth.confirmPassword")}</label>
           <Input type="password" placeholder="••••••••" {...register("confirmPassword")} />
           {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
         </div>
@@ -190,13 +191,13 @@ export default function SignupPage() {
         )}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Create Free Account ✨"}
+          {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : t("auth.createAccount")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-gray-500">
-        Already have an account?{" "}
-        <Link href="/login" className="text-orange-500 hover:text-orange-600 font-bold">Sign in</Link>
+        {t("auth.haveAccount")}{" "}
+        <Link href="/login" className="text-orange-500 hover:text-orange-600 font-bold">{t("auth.signInLower")}</Link>
       </p>
     </motion.div>
   );

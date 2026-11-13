@@ -14,6 +14,13 @@ export type ExerciseType =
 export type LessonStatus = "not_started" | "in_progress" | "completed" | "mastered";
 export type ChatRole = "user" | "assistant";
 
+export interface PassportStamp {
+  won_at: string;
+  wins: number;
+  best_hearts: number;
+  flawless: boolean;
+}
+
 export interface Profile {
   id: string;
   username: string;
@@ -33,6 +40,14 @@ export interface Profile {
   role: UserRole;
   access_tier?: AccessTier;
   app_language?: AppLanguage;
+  /** Regional-guardian passport stamps, keyed by boss id (written by /api/boss only). */
+  passport_stamps?: Record<string, PassportStamp>;
+  /** Cosmetics won from guardians, keyed by cosmetic id (written by /api/boss only). */
+  cosmetics?: Record<string, { got_at: string; boss: string }>;
+  /** Equipped avatar frame cosmetic id. */
+  equipped_frame?: string | null;
+  /** Equipped title cosmetic id. */
+  equipped_title?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -1,4 +1,5 @@
 import type { ActiveExercise } from "@/types/lesson";
+import { BOOST, EXTRA_LESSON_MAP } from "../content";
 import { GREETINGS_EXERCISES } from "./greetings";
 import { FAMILY_VOCAB, FAMILY_RELATIONSHIPS, FAMILY_CONVERSATION } from "./family";
 import { TIME_VOCAB, DAYS_MONTHS, TIME_PHRASES } from "./time";
@@ -21,21 +22,21 @@ const NUMBERS_1_10: ActiveExercise[] = [
     instruction: "What does ๑ (neung) mean?",
     question: "๑", thaiText: "๑", romanization: "neung",
     options: { choices: [{ id: "a", text: "2" }, { id: "b", text: "1" }, { id: "c", text: "3" }, { id: "d", text: "5" }] },
-    correctAnswer: "b", explanation: "๑ is the Thai numeral for 1 — หนึ่ง (neung).",
+    correctAnswer: "b", explanation: "๑ is the Thai numeral for 1, read หนึ่ง (neung).",
   },
   {
     id: "num-mc-2", type: "multiple_choice",
     instruction: "How do you say '5' in Thai?",
     question: "5 = ?",
     options: { choices: [{ id: "a", text: "สี่ (see)" }, { id: "b", text: "หก (hok)" }, { id: "c", text: "ห้า (ha)" }, { id: "d", text: "เจ็ด (jet)" }] },
-    correctAnswer: "c", explanation: "5 = ห้า (ha). Remember: high five → ห้า!",
+    correctAnswer: "c", explanation: "5 = ห้า (ha), as in high five.",
   },
   {
     id: "num-mc-3", type: "multiple_choice",
     instruction: "What does สาม mean?",
     question: "สาม", thaiText: "สาม", romanization: "sam",
     options: { choices: [{ id: "a", text: "2" }, { id: "b", text: "4" }, { id: "c", text: "3" }, { id: "d", text: "6" }] },
-    correctAnswer: "c", explanation: "สาม (sam) = 3. Like 'sam'urai — count to 3.",
+    correctAnswer: "c", explanation: "สาม (sam) = 3. Think 'sam'urai.",
   },
   {
     id: "num-match-1", type: "match_pairs",
@@ -57,7 +58,7 @@ const NUMBERS_1_10: ActiveExercise[] = [
     instruction: "เจ็ด = ?",
     question: "เจ็ด", thaiText: "เจ็ด", romanization: "jet",
     options: { choices: [{ id: "a", text: "6" }, { id: "b", text: "8" }, { id: "c", text: "7" }, { id: "d", text: "10" }] },
-    correctAnswer: "c", explanation: "เจ็ด (jet) = 7. Like a jet has 7 letters!",
+    correctAnswer: "c", explanation: "เจ็ด (jet) = 7. It sounds like 'jet'.",
   },
 ];
 
@@ -74,14 +75,14 @@ const NUMBERS_11_100: ActiveExercise[] = [
     instruction: "How do you say 11 in Thai?",
     question: "11 = ?",
     options: { choices: [{ id: "a", text: "สิบสอง" }, { id: "b", text: "สิบเอ็ด" }, { id: "c", text: "ยี่สิบ" }, { id: "d", text: "สิบ" }] },
-    correctAnswer: "b", explanation: "11 = สิบเอ็ด (sip-et). สิบ (10) + เอ็ด (1 — special form used for 11, 21, 31...)",
+    correctAnswer: "b", explanation: "11 = สิบเอ็ด (sip-et). สิบ (10) + เอ็ด (a special form of 1 used in 11, 21, 31...)",
   },
   {
     id: "num-mc-7", type: "multiple_choice",
     instruction: "ยี่สิบ = ?",
     question: "ยี่สิบ", thaiText: "ยี่สิบ", romanization: "yee-sip",
     options: { choices: [{ id: "a", text: "12" }, { id: "b", text: "21" }, { id: "c", text: "20" }, { id: "d", text: "30" }] },
-    correctAnswer: "c", explanation: "ยี่สิบ (yee-sip) = 20. Note: 20 uses ยี่ not สอง as the prefix.",
+    correctAnswer: "c", explanation: "ยี่สิบ (yee-sip) = 20. For 20 you start with ยี่, not สอง.",
   },
   {
     id: "num-match-2", type: "match_pairs",
@@ -111,20 +112,20 @@ const CLASSIFIERS: ActiveExercise[] = [
   {
     id: "clf-mc-1", type: "multiple_choice",
     instruction: "Which classifier is used for people?",
-    question: "นักเรียนสองคน (two students) — what does คน mean here?",
+    question: "นักเรียนสองคน (two students): what does คน mean here?",
     options: { choices: [{ id: "a", text: "people (classifier)" }, { id: "b", text: "animals" }, { id: "c", text: "books" }, { id: "d", text: "bottles" }] },
     correctAnswer: "a", explanation: "คน (khon) is used to count people. นักเรียนสองคน = two students.",
   },
   {
     id: "clf-mc-2", type: "multiple_choice",
     instruction: "แมวสองตัว = ?",
-    question: "แมวสองตัว — what does ตัว count?",
+    question: "แมวสองตัว: what does ตัว count?",
     options: { choices: [{ id: "a", text: "people" }, { id: "b", text: "animals & clothing" }, { id: "c", text: "flat objects" }, { id: "d", text: "bottles" }] },
     correctAnswer: "b", explanation: "ตัว (tua) counts animals and clothing. แมวสองตัว = two cats.",
   },
   {
     id: "clf-mc-3", type: "multiple_choice",
-    instruction: "หนังสือสี่เล่ม — what does เล่ม count?",
+    instruction: "หนังสือสี่เล่ม: what does เล่ม count?",
     question: "หนังสือสี่เล่ม = four ___",
     options: { choices: [{ id: "a", text: "bottles" }, { id: "b", text: "pens" }, { id: "c", text: "books" }, { id: "d", text: "people" }] },
     correctAnswer: "c", explanation: "เล่ม (lem) counts books and sharp objects. หนังสือสี่เล่ม = four books.",
@@ -147,7 +148,7 @@ const CLASSIFIERS: ActiveExercise[] = [
   {
     id: "clf-mc-4", type: "multiple_choice",
     instruction: "น้ำสองขวด = ?",
-    question: "น้ำสองขวด — ขวด counts what?",
+    question: "น้ำสองขวด: what does ขวด count?",
     options: { choices: [{ id: "a", text: "cups" }, { id: "b", text: "bags" }, { id: "c", text: "bottles" }, { id: "d", text: "cans" }] },
     correctAnswer: "c", explanation: "ขวด (khuat) = bottle. น้ำสองขวด = two bottles of water.",
   },
@@ -166,14 +167,14 @@ const FOOD_VOCAB: ActiveExercise[] = [
     instruction: "How do you say 'delicious' in Thai?",
     question: "How do you say 'delicious'?",
     options: { choices: [{ id: "a", text: "เผ็ด (phet)" }, { id: "b", text: "หวาน (wan)" }, { id: "c", text: "อร่อย (a-roi)" }, { id: "d", text: "เค็ม (khem)" }] },
-    correctAnswer: "c", explanation: "อร่อย (a-roi) = delicious. A compliment every Thai cook loves to hear!",
+    correctAnswer: "c", explanation: "อร่อย (a-roi) = delicious. Thai cooks love hearing it.",
   },
   {
     id: "food-mc-3", type: "multiple_choice",
     instruction: "เผ็ด means?",
     question: "เผ็ด", thaiText: "เผ็ด", romanization: "phet",
     options: { choices: [{ id: "a", text: "sweet" }, { id: "b", text: "salty" }, { id: "c", text: "sour" }, { id: "d", text: "spicy" }] },
-    correctAnswer: "d", explanation: "เผ็ด (phet) = spicy. Very useful when ordering food in Thailand!",
+    correctAnswer: "d", explanation: "เผ็ด (phet) = spicy. You'll need this one every time you order food.",
   },
   {
     id: "food-match-1", type: "match_pairs",
@@ -188,7 +189,7 @@ const FOOD_VOCAB: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "These are essential words for any meal in Thailand.",
+    explanation: "You'll use these words at almost every meal in Thailand.",
   },
   {
     id: "food-mc-4", type: "multiple_choice",
@@ -220,7 +221,7 @@ const ORDERING_FOOD: ActiveExercise[] = [
     instruction: "How do you ask 'how much?'",
     question: "เท่าไหร่", thaiText: "เท่าไหร่", romanization: "thao-rai",
     options: { choices: [{ id: "a", text: "how much?" }, { id: "b", text: "too spicy!" }, { id: "c", text: "check please" }, { id: "d", text: "one more" }] },
-    correctAnswer: "a", explanation: "เท่าไหร่ (thao-rai) = how much? Essential for shopping and restaurants.",
+    correctAnswer: "a", explanation: "เท่าไหร่ (thao-rai) = how much? You'll use it in shops and restaurants.",
   },
   {
     id: "ord-mc-3", type: "multiple_choice",
@@ -267,7 +268,7 @@ const FOOD_LISTENING: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "These phrases cover a complete restaurant experience in Thailand.",
+    explanation: "With these four you can get through a whole meal out, from the menu to the bill.",
   },
   {
     id: "fl-mc-3", type: "multiple_choice",
@@ -281,7 +282,7 @@ const FOOD_LISTENING: ActiveExercise[] = [
     instruction: "How do you say 'one plate of ...'?",
     question: "One plate of green curry, please.",
     options: { choices: [{ id: "a", text: "แกงเขียวหวาน สองจาน" }, { id: "b", text: "ขอแกงเขียวหวานหนึ่งจาน" }, { id: "c", text: "เก็บแกงเขียวหวาน" }, { id: "d", text: "ไม่แกงเขียวหวาน" }] },
-    correctAnswer: "b", explanation: "ขอ + dish + หนึ่งจาน (one plate). Always start with ขอ when ordering.",
+    correctAnswer: "b", explanation: "ขอ + dish + หนึ่งจาน (one plate). Start with ขอ when you order.",
   },
 ];
 
@@ -291,7 +292,7 @@ const TRANSPORT_VOCAB: ActiveExercise[] = [
     instruction: "รถแท็กซี่ = ?",
     question: "รถแท็กซี่", thaiText: "รถแท็กซี่", romanization: "rot-taek-see",
     options: { choices: [{ id: "a", text: "bus" }, { id: "b", text: "taxi" }, { id: "c", text: "train" }, { id: "d", text: "motorbike" }] },
-    correctAnswer: "b", explanation: "รถแท็กซี่ = taxi. รถ (rot) means 'vehicle' — you'll see it in many transport words.",
+    correctAnswer: "b", explanation: "รถแท็กซี่ = taxi. รถ (rot) means 'vehicle', and you'll see it in many transport words.",
   },
   {
     id: "trans-mc-2", type: "multiple_choice",
@@ -390,7 +391,7 @@ const SHOPPING_VOCAB: ActiveExercise[] = [
     instruction: "ถูก = ?",
     question: "ถูก", thaiText: "ถูก", romanization: "thuk",
     options: { choices: [{ id: "a", text: "expensive" }, { id: "b", text: "free" }, { id: "c", text: "cheap" }, { id: "d", text: "medium" }] },
-    correctAnswer: "c", explanation: "ถูก (thuk) = cheap. Also means 'correct' — context matters!",
+    correctAnswer: "c", explanation: "ถูก (thuk) = cheap. It also means 'correct', so context matters.",
   },
   {
     id: "shop-mc-3", type: "multiple_choice",
@@ -459,7 +460,7 @@ const BARGAINING: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "Bargaining is expected at Thai markets — use these phrases confidently!",
+    explanation: "Bargaining is expected at Thai markets, so don't be shy with these phrases.",
   },
   {
     id: "barg-mc-3", type: "multiple_choice",
@@ -512,7 +513,7 @@ const EMERGENCY_PHRASES: ActiveExercise[] = [
     instruction: "What is the emergency number for police in Thailand?",
     question: "Thailand police emergency number?",
     options: { choices: [{ id: "a", text: "999" }, { id: "b", text: "112" }, { id: "c", text: "191" }, { id: "d", text: "911" }] },
-    correctAnswer: "c", explanation: "191 = Thai police. 1669 = ambulance. 199 = fire department. Save these!",
+    correctAnswer: "c", explanation: "191 = Thai police. 1669 = ambulance. 199 = fire department. Save them in your phone.",
   },
 ];
 
@@ -568,7 +569,7 @@ const POLITE_EXTRA: ActiveExercise[] = [
     id: "pol-mc-1", type: "multiple_choice",
     instruction: "ค่ะ/คะ is used by whom?",
     question: "Who uses ค่ะ or คะ at the end of sentences?",
-    options: { choices: [{ id: "a", text: "Men" }, { id: "b", text: "Women" }, { id: "c", text: "Both" }, { id: "d", text: "Neither — it's optional" }] },
+    options: { choices: [{ id: "a", text: "Men" }, { id: "b", text: "Women" }, { id: "c", text: "Both" }, { id: "d", text: "Neither, it's optional" }] },
     correctAnswer: "b", explanation: "ค่ะ (statement) and คะ (question) are used by women. Men use ครับ for both.",
   },
   {
@@ -584,9 +585,9 @@ const PRACTICE_EXTRA: ActiveExercise[] = [
   {
     id: "prac-mc-1", type: "multiple_choice",
     instruction: "Someone says สวัสดีครับ to you. How do you respond?",
-    question: "Someone says สวัสดีครับ — you reply:",
+    question: "Someone says สวัสดีครับ. You reply:",
     options: { choices: [{ id: "a", text: "ขอบคุณครับ/ค่ะ" }, { id: "b", text: "สวัสดีครับ/ค่ะ" }, { id: "c", text: "ไม่เป็นไร" }, { id: "d", text: "ขอโทษครับ/ค่ะ" }] },
-    correctAnswer: "b", explanation: "You greet back with สวัสดีครับ/ค่ะ — Thai greetings are reciprocal!",
+    correctAnswer: "b", explanation: "Just say สวัสดีครับ/ค่ะ back. In Thai you return the same greeting.",
   },
   {
     id: "prac-mc-2", type: "multiple_choice",
@@ -600,7 +601,7 @@ const PRACTICE_EXTRA: ActiveExercise[] = [
         { id: "d", text: "Only 'sorry'" },
       ],
     },
-    correctAnswer: "c", explanation: "ไม่เป็นไร is extremely versatile — one of the most useful Thai phrases!",
+    correctAnswer: "c", explanation: "ไม่เป็นไร fits a lot of situations, and you'll use it every day.",
   },
 ];
 
@@ -691,6 +692,25 @@ const LESSON_MAP: Record<string, ActiveExercise[]> = {
   "province/lesson/chiang_rai": PROVINCE_CHIANG_RAI,
 };
 
-export function getLessonExercises(moduleId: string, lessonId: string): ActiveExercise[] {
-  return LESSON_MAP[`${moduleId}/${lessonId}`] ?? GREETINGS_EXERCISES;
+/** Old map links were /learn/province/lesson/<id>, i.e. key "province/<id>". */
+function legacyKey(key: string): string {
+  return key.startsWith("province/") ? `province/lesson/${key.slice("province/".length)}` : key;
 }
+
+/**
+ * Exercises for a lesson route, plus any extra exercises from the content packs.
+ * Unknown lessons return [] (the lesson page shows "not found") instead of
+ * silently falling back to the greetings lesson, which made every broken link
+ * look like the same lesson.
+ */
+export function getLessonExercises(moduleId: string, lessonId: string): ActiveExercise[] {
+  const key = `${moduleId}/${lessonId}`;
+  const base = LESSON_MAP[key] ?? LESSON_MAP[legacyKey(key)] ?? EXTRA_LESSON_MAP[key];
+  if (!base) return [];
+  return [...base, ...(BOOST[key] ?? [])];
+}
+
+export { GREETINGS_EXERCISES };
+
+/** Read-only view of the original lesson table, for scripts/check-content.ts. */
+export const LESSON_MAP_FOR_CHECKS: Readonly<Record<string, ActiveExercise[]>> = LESSON_MAP;

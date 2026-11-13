@@ -88,7 +88,7 @@ export const OFFICE_PHRASES: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "รอสักครู่ is very useful in any service situation in Thailand.",
+    explanation: "รอสักครู่ (please wait a moment) is what you'll hear in shops, restaurants and offices all over Thailand.",
   },
   {
     id: "off-drag-1", type: "drag_drop",

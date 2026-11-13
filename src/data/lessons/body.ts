@@ -6,7 +6,7 @@ export const BODY_PARTS: ActiveExercise[] = [
     instruction: "หัว = ?",
     question: "หัว", thaiText: "หัว", romanization: "hua",
     options: { choices: [{ id: "a", text: "hand" }, { id: "b", text: "foot" }, { id: "c", text: "head" }, { id: "d", text: "eye" }] },
-    correctAnswer: "c", explanation: "หัว (hua) = head. It also means the top/beginning of things — หัวหน้า = leader (head person).",
+    correctAnswer: "c", explanation: "หัว (hua) = head. It can also mean the top or start of something: หัวหน้า = leader (the head person).",
   },
   {
     id: "body-mc-2", type: "multiple_choice",
@@ -20,7 +20,7 @@ export const BODY_PARTS: ActiveExercise[] = [
     instruction: "ตา = ?",
     question: "ตา", thaiText: "ตา", romanization: "ta",
     options: { choices: [{ id: "a", text: "ear" }, { id: "b", text: "nose" }, { id: "c", text: "mouth" }, { id: "d", text: "eye" }] },
-    correctAnswer: "d", explanation: "ตา (ta) = eye. Also means maternal grandfather! Context matters in Thai.",
+    correctAnswer: "d", explanation: "ตา (ta) = eye. It also means grandpa on your mother's side, so context matters.",
   },
   {
     id: "body-match-1", type: "match_pairs",
@@ -35,14 +35,14 @@ export const BODY_PARTS: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "Remember: in Thai culture, the head is sacred and feet are considered low — never point feet at people!",
+    explanation: "In Thai culture the head is sacred and the feet are low, so never point your feet at people.",
   },
   {
     id: "body-mc-4", type: "multiple_choice",
     instruction: "หน้า can mean?",
-    question: "หน้า (na) — which TWO meanings does it have?",
+    question: "หน้า (na): which two meanings does it have?",
     options: { choices: [{ id: "a", text: "face AND front" }, { id: "b", text: "ear AND hear" }, { id: "c", text: "hand AND hold" }, { id: "d", text: "eye AND see" }] },
-    correctAnswer: "a", explanation: "หน้า (na) = face AND front/next. ข้างหน้า = in front of. หน้าตา = appearance.",
+    correctAnswer: "a", explanation: "หน้า (na) = face, and also front or next. ข้างหน้า = in front of. หน้าตา = appearance.",
   },
 ];
 
@@ -82,7 +82,7 @@ export const BODY_PHRASES: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "Pattern: ปวด + body part = that body part hurts. เจ็บ also means hurt but more sharp pain.",
+    explanation: "Pattern: ปวด + body part = that body part hurts. เจ็บ also means hurt, but for sharper pain.",
   },
   {
     id: "bodyphr-mc-3", type: "multiple_choice",

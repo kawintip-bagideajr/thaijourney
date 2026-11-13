@@ -10,10 +10,10 @@ export async function POST() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    await adminDb.collection("profiles").doc(user.uid).update({
+    await adminDb.collection("profiles").doc(user.uid).set({
       access_tier: "pro",
       updated_at: new Date().toISOString(),
-    });
+    }, { merge: true });
 
     return NextResponse.json({ success: true });
   } catch (error) {

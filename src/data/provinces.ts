@@ -1,3 +1,4 @@
+import { NEW_PROVINCES } from "./provinces-extra";
 export interface ProvinceData {
   id: string;
   name_en: string;
@@ -20,7 +21,7 @@ export const PROVINCES: ProvinceData[] = [
     name_en: "Bangkok",
     name_th: "กรุงเทพมหานคร",
     region: "Central",
-    description: "The vibrant capital city — start your Thai journey here",
+    description: "Thailand's capital and your first stop: street food, temples, river boats",
     key_phrase: "สวัสดีครับ/ค่ะ",
     key_phrase_translation: "Hello (polite)",
     unlock_xp: 0,
@@ -35,7 +36,7 @@ export const PROVINCES: ProvinceData[] = [
     name_en: "Chiang Mai",
     name_th: "เชียงใหม่",
     region: "North",
-    description: "The Rose of the North — temples, mountains, and night markets",
+    description: "Old city temples, Doi Suthep and the Sunday walking street",
     key_phrase: "กินข้าวแล้วหรือยัง",
     key_phrase_translation: "Have you eaten yet?",
     unlock_xp: 100,
@@ -50,7 +51,7 @@ export const PROVINCES: ProvinceData[] = [
     name_en: "Phuket",
     name_th: "ภูเก็ต",
     region: "South",
-    description: "Paradise island with stunning beaches and vibrant nightlife",
+    description: "Thailand's biggest island: beaches, old town shophouses, Patong nights",
     key_phrase: "ทะเลสวยมาก",
     key_phrase_translation: "The sea is very beautiful",
     unlock_xp: 250,
@@ -65,7 +66,7 @@ export const PROVINCES: ProvinceData[] = [
     name_en: "Chiang Rai",
     name_th: "เชียงราย",
     region: "North",
-    description: "Home of the White Temple and Golden Triangle",
+    description: "Home of the White Temple and the Golden Triangle",
     key_phrase: "ไปไหนมา",
     key_phrase_translation: "Where have you been?",
     unlock_xp: 200,
@@ -110,7 +111,7 @@ export const PROVINCES: ProvinceData[] = [
     name_en: "Koh Samui",
     name_th: "เกาะสมุย",
     region: "South",
-    description: "Tropical island paradise in the Gulf of Thailand",
+    description: "Gulf of Thailand island of beaches and coconut groves",
     key_phrase: "เกาะสวยมาก",
     key_phrase_translation: "The island is very beautiful",
     unlock_xp: 400,
@@ -125,7 +126,7 @@ export const PROVINCES: ProvinceData[] = [
     name_en: "Pai",
     name_th: "ปาย",
     region: "North",
-    description: "Hippie mountain town with hot springs and waterfalls",
+    description: "Laid-back mountain town with hot springs, waterfalls and a canyon",
     key_phrase: "อากาศเย็นสบาย",
     key_phrase_translation: "The weather is cool and comfortable",
     unlock_xp: 300,
@@ -155,7 +156,7 @@ export const PROVINCES: ProvinceData[] = [
     name_en: "Sukhothai",
     name_th: "สุโขทัย",
     region: "North",
-    description: "Birthplace of Thai civilisation and the Sukhothai Kingdom",
+    description: "Capital of the first Thai kingdom, now a park of old temple ruins",
     key_phrase: "รุ่งเรืองในอดีต",
     key_phrase_translation: "Glorious in the past",
     unlock_xp: 220,
@@ -165,4 +166,5 @@ export const PROVINCES: ProvinceData[] = [
     emoji: "🏛️",
     color: "#FCD34D",
   },
+  ...NEW_PROVINCES,
 ];

@@ -20,7 +20,7 @@ export const EMOTIONS_VOCAB: ActiveExercise[] = [
     instruction: "โกรธ = ?",
     question: "โกรธ", thaiText: "โกรธ", romanization: "grot",
     options: { choices: [{ id: "a", text: "happy" }, { id: "b", text: "nervous" }, { id: "c", text: "surprised" }, { id: "d", text: "angry" }] },
-    correctAnswer: "d", explanation: "โกรธ (grot) = angry. In Thailand, showing anger openly is considered bad form — stay calm!",
+    correctAnswer: "d", explanation: "โกรธ (grot) = angry. Showing anger openly is frowned on in Thailand, so try to stay calm.",
   },
   {
     id: "emo-match-1", type: "match_pairs",
@@ -35,14 +35,14 @@ export const EMOTIONS_VOCAB: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "Thai emotion words often combine ใจ (heart) — a window into the language's feelings.",
+    explanation: "Lots of Thai emotion words are built with ใจ (heart).",
   },
   {
     id: "emo-mc-4", type: "multiple_choice",
     instruction: "ตื่นเต้น = ?",
     question: "ตื่นเต้น", thaiText: "ตื่นเต้น", romanization: "dteun den",
     options: { choices: [{ id: "a", text: "bored" }, { id: "b", text: "excited" }, { id: "c", text: "confused" }, { id: "d", text: "relaxed" }] },
-    correctAnswer: "b", explanation: "ตื่นเต้น (dteun den) = excited. Use it to express anticipation.",
+    correctAnswer: "b", explanation: "ตื่นเต้น (dteun den) = excited. Use it when you're looking forward to something.",
   },
 ];
 
@@ -59,7 +59,7 @@ export const EMOTIONS_EXPRESSIONS: ActiveExercise[] = [
     instruction: "เครียด = ?",
     question: "เครียด", thaiText: "เครียด", romanization: "khriat",
     options: { choices: [{ id: "a", text: "relaxed" }, { id: "b", text: "happy" }, { id: "c", text: "stressed" }, { id: "d", text: "lonely" }] },
-    correctAnswer: "c", explanation: "เครียด (khriat) = stressed. Very commonly used — Thais often say อย่าเครียด (don't stress).",
+    correctAnswer: "c", explanation: "เครียด (khriat) = stressed. You'll hear it a lot, and Thais often tell each other อย่าเครียด (don't stress).",
   },
   {
     id: "emoex-fill-1", type: "fill_blank",
@@ -82,7 +82,7 @@ export const EMOTIONS_EXPRESSIONS: ActiveExercise[] = [
       ],
     },
     correctAnswer: {},
-    explanation: "สบายดี is the classic Thai 'I'm fine' — used as both a greeting response and a state.",
+    explanation: "สบายดี is the standard Thai 'I'm fine'. Use it to answer 'how are you?' or just to say you're doing well.",
   },
   {
     id: "emoex-mc-3", type: "multiple_choice",

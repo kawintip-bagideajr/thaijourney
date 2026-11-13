@@ -27,7 +27,7 @@ export function AchievementPopup() {
           <div className="bg-white rounded-2xl shadow-2xl border-2 border-amber-200 px-6 py-4 flex items-center gap-4 min-w-[280px]">
             <div className="text-4xl animate-bounce-in">{showAchievement.icon}</div>
             <div>
-              <p className="text-xs font-bold text-amber-500 uppercase tracking-wider">Achievement Unlocked!</p>
+              <p className="text-xs font-bold text-amber-500">Achievement unlocked</p>
               <p className="font-bold text-gray-900">{showAchievement.title}</p>
             </div>
           </div>
@@ -54,7 +54,7 @@ export function AchievementPopup() {
             <div className="bg-white rounded-3xl shadow-2xl px-12 py-8 border-4 border-amber-300">
               <p className="text-amber-500 font-bold text-lg">Level Up!</p>
               <p className="text-6xl font-black text-gray-900 my-2">{showLevelUp}</p>
-              <p className="text-gray-500">You reached a new level!</p>
+              <p className="text-gray-500">You reached a new level.</p>
             </div>
           </div>
         </motion.div>

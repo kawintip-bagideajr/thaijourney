@@ -1,220 +1,221 @@
 "use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Copy, Check, QrCode, Zap, RefreshCcw, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  Crown, Check, Zap, Sparkles, Heart, RefreshCcw,
+  Settings, Loader2, AlertCircle,
+} from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
-const PROMPTPAY_ID = "0812345678";
-const MONTHLY_THB = 175;
 const MONTHLY_USD = 5;
+const MONTHLY_THB = 175;
 
-export default function SubscribePage() {
+function SubscribeContent() {
   const profile = useAuthStore((s) => s.profile);
   const updateProfile = useAuthStore((s) => s.updateProfile);
-  const [copied, setCopied] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [activated, setActivated] = useState(false);
+  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const isPro = profile?.access_tier === "pro";
 
-  const copyId = () => {
-    navigator.clipboard.writeText(PROMPTPAY_ID);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  useEffect(() => {
+    if (searchParams.get("success") === "1") {
+      setShowSuccess(true);
+      router.replace("/subscribe");
+      // Poll for Pro status — webhook may take a few seconds
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        try {
+          const res = await fetch("/api/user/me");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.access_tier === "pro") {
+              updateProfile({ access_tier: "pro" });
+              clearInterval(interval);
+            }
+          }
+        } catch { /* ignore */ }
+        if (attempts >= 10) clearInterval(interval);
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [searchParams, router, updateProfile]);
 
-  const handleConfirm = async () => {
-    setShowConfirm(false);
+  const handleSubscribe = async () => {
+    setLoading(true);
+    setError("");
     try {
-      await fetch("/api/user/upgrade", { method: "POST" });
-      updateProfile({ access_tier: "pro" });
-    } catch {}
-    setActivated(true);
+      const res = await fetch("/api/stripe/checkout", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        setError(data.error ?? "มีบางอย่างผิดพลาด ลองใหม่อีกครั้งนะ");
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setError("มีบางอย่างผิดพลาด ลองใหม่อีกครั้งนะ");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (activated || isPro) {
+  const handleManage = async () => {
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {
+      // ignore
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  if (showSuccess || isPro) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-16 pb-28 flex flex-col items-center text-center space-y-5">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 280, damping: 18 }}
-          className="w-20 h-20 gradient-thai rounded-3xl flex items-center justify-center"
-        >
-          <Crown size={36} className="text-white" />
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <h1 className="text-2xl font-black text-gray-900">
-            {activated && !isPro ? "Pro Activated! 🎉" : "You're already Pro!"}
-          </h1>
-          <p className="text-gray-500 text-sm mt-2 leading-relaxed">
-            Welcome to Pro. All AI features are unlocked. Your subscription renews monthly — just repeat the payment each month to stay Pro.
-          </p>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="w-full space-y-2"
-        >
-          {["Kru AI Chat ✓", "Grammar Checker ✓", "AI Dictionary ✓"].map((f) => (
-            <div key={f} className="flex items-center gap-2 p-3 bg-orange-50 rounded-2xl">
-              <Sparkles size={14} className="text-orange-500" />
-              <span className="text-sm font-semibold text-orange-700">{f}</span>
-            </div>
-          ))}
-        </motion.div>
-        <Link href="/chat">
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            className="gradient-thai text-white font-black px-8 py-3.5 rounded-2xl flex items-center gap-2"
+      <div className="max-w-lg mx-auto px-4 py-10 pb-28">
+        <div className="game-card p-6 flex flex-col items-center text-center space-y-5">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 280, damping: 18 }}
+            className="w-24 h-24 rounded-3xl bg-amber-50 border-2 border-amber-200 shadow-[0_5px_0_#fde68a] flex items-center justify-center"
           >
-            <Zap size={16} />
-            Start Using AI Features
-          </motion.button>
-        </Link>
+            <span className="text-6xl select-none" aria-hidden="true">👑</span>
+          </motion.div>
+
+          <div>
+            <h1 className="font-display text-2xl sm:text-3xl text-gray-900">
+              {showSuccess && !isPro ? "กำลังอัปเดต..." : t("subscribe.alreadyPro")}
+            </h1>
+            <p className="text-sm font-bold text-gray-500 mt-2 leading-relaxed">
+              {t("subscribe.welcomeToPro")}
+            </p>
+          </div>
+
+          <div className="w-full game-rows rounded-2xl bg-orange-50 border-2 border-orange-100 px-3 text-left">
+            {[t("subscribe.feature1"), t("subscribe.feature2"), t("subscribe.feature3")].map((f) => (
+              <div key={f} className="flex items-center gap-3 py-2.5">
+                <Sparkles size={15} className="text-orange-500 shrink-0" />
+                <span className="text-sm font-extrabold text-orange-700">{f}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col w-full gap-3 pt-1">
+            <motion.a
+              href="/chat"
+              whileTap={{ scale: 0.97 }}
+              className="btn-3d h-14 px-8 rounded-2xl bg-orange-500 text-white font-display text-base flex items-center justify-center gap-2 [--btn-edge:#c2410c]"
+            >
+              <Zap size={18} className="fill-white" />
+              {t("subscribe.startUsingAi")}
+            </motion.a>
+            <button
+              onClick={handleManage}
+              disabled={portalLoading}
+              className="btn-3d h-12 px-6 rounded-2xl bg-white border-2 border-[var(--game-edge)] text-gray-700 font-extrabold text-sm flex items-center justify-center gap-2 [--btn-edge:var(--game-edge)] disabled:opacity-60"
+            >
+              {portalLoading ? <Loader2 size={16} className="animate-spin" /> : <Settings size={16} />}
+              จัดการ Subscription
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6 pb-28 space-y-5">
-      {/* Header */}
-      <div className="gradient-thai rounded-3xl p-6 text-white text-center">
-        <Crown size={32} className="mx-auto mb-3" />
-        <h1 className="text-2xl font-black">Pro Subscription</h1>
-        <div className="flex items-baseline justify-center gap-1 mt-2">
-          <span className="text-4xl font-black">${MONTHLY_USD}</span>
-          <span className="text-lg opacity-80">/ month</span>
-        </div>
-        <p className="text-sm opacity-70 mt-1">≈ ฿{MONTHLY_THB} / month</p>
-      </div>
-
-      {/* What you get */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-2.5">
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Included in Pro</p>
-        {[
-          "Kru AI Chat — unlimited Thai tutoring",
-          "AI Grammar Checker for Thai sentences",
-          "Smart AI Dictionary with examples",
-          "Priority support",
-        ].map((f) => (
-          <div key={f} className="flex items-center gap-2">
-            <Check size={14} className="text-orange-500 flex-shrink-0" />
-            <span className="text-sm text-gray-700">{f}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Renewal note */}
-      <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
-        <RefreshCcw size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-700 leading-relaxed">
-          <strong>Monthly renewal:</strong> Your Pro access lasts 30 days from activation.
-          To renew, simply repeat the payment each month and tap "I've paid."
-        </p>
-      </div>
-
-      {/* Payment info */}
-      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-        <div className="p-4 border-b border-gray-50">
-          <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-            <QrCode size={16} className="text-gray-500" />
-            Pay ฿{MONTHLY_THB} via PromptPay
-          </h2>
-        </div>
-        <div className="p-6 flex flex-col items-center gap-4">
-          {/* QR placeholder */}
-          <div className="w-44 h-44 bg-gray-100 rounded-2xl flex items-center justify-center">
-            <div className="text-center">
-              <QrCode size={44} className="mx-auto mb-2 text-gray-300" />
-              <p className="text-xs text-gray-400">QR Code</p>
-              <p className="text-xs text-gray-400">(available after setup)</p>
-            </div>
-          </div>
-
-          <div className="w-full">
-            <p className="text-xs text-gray-400 mb-1 text-center">PromptPay number</p>
-            <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-4 py-3">
-              <span className="flex-1 font-mono font-bold text-gray-900 tracking-widest text-center">
-                {PROMPTPAY_ID}
-              </span>
-              <button onClick={copyId} className="text-gray-400">
-                {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
-              </button>
-            </div>
-          </div>
-
-          <div className="w-full bg-blue-50 rounded-xl p-3">
-            <p className="text-xs text-blue-700 text-center leading-relaxed">
-              Transfer <strong>฿{MONTHLY_THB}</strong> and include your
-              <strong> username</strong> in the payment note.
-              Then tap <strong>"I've paid"</strong> below.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <motion.button
-        whileTap={{ scale: 0.97 }}
-        onClick={() => setShowConfirm(true)}
-        className="w-full gradient-thai text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2"
+      {/* Hero: the plan card itself, with the checkout button */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="game-card !rounded-[2rem] p-6 !border-orange-300 !shadow-[0_6px_0_#fdba74]"
       >
-        <Crown size={18} />
-        I&apos;ve paid — Activate Pro!
-      </motion.button>
+        <p className="text-xs font-extrabold text-orange-500 flex items-center gap-1">
+          <Crown size={12} aria-hidden="true" /> PRO
+        </p>
+        <h1 className="font-display text-2xl sm:text-3xl text-gray-900 leading-tight mt-1">{t("subscribe.title")}</h1>
 
-      <p className="text-center text-xs text-gray-400 px-4">
-        Activation is instant after confirmation. For questions, contact us via the app.
-      </p>
+        <div className="mt-4 flex items-baseline gap-1 flex-wrap">
+          <span className="font-display text-5xl text-orange-500 tabular-nums leading-none">${MONTHLY_USD}</span>
+          <span className="text-base font-extrabold text-gray-500">{t("subscribe.perMonth")}</span>
+          <span className="text-[11px] font-extrabold text-gray-500 ml-auto">{t("subscribe.approxBaht", { n: MONTHLY_THB })}</span>
+        </div>
 
-      {/* Confirm modal */}
-      <AnimatePresence>
-        {showConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center p-4"
-            onClick={() => setShowConfirm(false)}
-          >
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 400, damping: 40 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl p-6 w-full max-w-sm space-y-4"
-            >
-              <div className="text-center">
-                <div className="w-12 h-12 gradient-thai rounded-2xl mx-auto mb-3 flex items-center justify-center">
-                  <Crown size={22} className="text-white" />
-                </div>
-                <h3 className="font-black text-gray-900">Confirm Payment</h3>
-                <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                  Did you transfer <strong>฿{MONTHLY_THB}</strong> to PromptPay <strong>{PROMPTPAY_ID}</strong>?
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowConfirm(false)}
-                  className="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-700 font-bold text-sm"
-                >
-                  Not yet
-                </button>
-                <button
-                  onClick={handleConfirm}
-                  className="flex-1 py-3 rounded-2xl gradient-thai text-white font-bold text-sm"
-                >
-                  Yes, activate!
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+        <div className="mt-5 space-y-2.5">
+          <p className="text-xs font-extrabold text-gray-500">🎁 {t("subscribe.includedInPro")}</p>
+          {[t("subscribe.proItem1"), t("subscribe.proItem2"), t("subscribe.proItem3"), t("subscribe.proItem4")].map((f) => (
+            <div key={f} className="flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded-full flex items-center justify-center border-2 bg-orange-100 border-orange-300 shrink-0">
+                <Check size={13} strokeWidth={3} className="text-orange-600" />
+              </span>
+              <span className="text-sm font-bold text-gray-700">{f}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Stripe CTA */}
+        {error && (
+          <div className="mt-5 flex items-start gap-2 p-3 rounded-2xl bg-red-50 border-2 border-red-200" role="alert">
+            <AlertCircle size={15} className="text-red-500 flex-shrink-0 mt-0.5" />
+            <p className="text-xs font-bold text-red-600">{error}</p>
+          </div>
         )}
-      </AnimatePresence>
+
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={handleSubscribe}
+          disabled={loading}
+          className="btn-3d shimmer mt-5 w-full h-14 rounded-2xl bg-orange-500 text-white font-display text-lg flex items-center justify-center gap-2 [--btn-edge:#c2410c] disabled:opacity-70"
+        >
+          {loading ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            <>
+              <Crown size={18} />
+              สมัคร Pro ด้วย Stripe
+            </>
+          )}
+        </motion.button>
+      </motion.section>
+
+      {/* Renewal note: plain hint, no box */}
+      <div className="flex items-start gap-3 px-2">
+        <RefreshCcw size={16} className="text-amber-500 shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm text-amber-700 font-extrabold">ต่ออายุอัตโนมัติทุกเดือน</p>
+          <p className="text-xs font-bold text-amber-600 mt-0.5">ยกเลิกได้ตลอดเวลาผ่าน Stripe portal ไม่มีค่าปรับ</p>
+        </div>
+      </div>
+
+      {/* Trust line */}
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] font-extrabold text-gray-500">
+        <span>🔒 ชำระผ่าน Stripe</span>
+        <span>💳 จ่ายด้วยบัตรได้</span>
+        <span className="flex items-center gap-1">
+          <Heart size={10} className="text-rose-400 fill-rose-400" />
+          ยกเลิกได้ทุกเมื่อ
+        </span>
+      </div>
     </div>
+  );
+}
+
+export default function SubscribePage() {
+  return (
+    <Suspense>
+      <SubscribeContent />
+    </Suspense>
   );
 }

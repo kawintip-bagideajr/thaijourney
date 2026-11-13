@@ -4,16 +4,19 @@ import { persist } from "zustand/middleware";
 
 export type AppTheme = "light" | "sakura" | "ocean" | "forest" | "dark";
 export type AppLanguage = "en" | "th" | "ja" | "zh" | "ko" | "fr";
+export type DarkAccent = "indigo" | "teal" | "emerald" | "rose" | "sky";
 
 interface SettingsState {
   sfxEnabled: boolean;
   sfxVolume: number;
   theme: AppTheme;
   language: AppLanguage;
+  darkAccent: DarkAccent;
   setSfxEnabled: (v: boolean) => void;
   setSfxVolume: (v: number) => void;
   setTheme: (v: AppTheme) => void;
   setLanguage: (v: AppLanguage) => void;
+  setDarkAccent: (v: DarkAccent) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -23,10 +26,12 @@ export const useSettingsStore = create<SettingsState>()(
       sfxVolume: 0.7,
       theme: "light",
       language: "en",
+      darkAccent: "indigo",
       setSfxEnabled: (sfxEnabled) => set({ sfxEnabled }),
       setSfxVolume: (sfxVolume) => set({ sfxVolume }),
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => set({ language }),
+      setDarkAccent: (darkAccent) => set({ darkAccent }),
     }),
     { name: "thaiJN-settings" }
   )

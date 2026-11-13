@@ -10,11 +10,11 @@ export interface AchievementDef {
 
 export const ACHIEVEMENTS: AchievementDef[] = [
   // Streak
-  { slug: "streak_3", title: "On a Roll", description: "Maintain a 3-day streak", icon: "🔥", category: "streak", condition: { type: "streak_days", value: 3 }, xp_reward: 20 },
-  { slug: "streak_7", title: "Week Warrior", description: "Maintain a 7-day streak", icon: "🔥", category: "streak", condition: { type: "streak_days", value: 7 }, xp_reward: 50 },
-  { slug: "streak_30", title: "Month Master", description: "Maintain a 30-day streak", icon: "🏆", category: "streak", condition: { type: "streak_days", value: 30 }, xp_reward: 200 },
-  { slug: "streak_100", title: "Century Streak", description: "Maintain a 100-day streak", icon: "💎", category: "streak", condition: { type: "streak_days", value: 100 }, xp_reward: 500 },
-  { slug: "streak_365", title: "Year of Thai", description: "Maintain a 365-day streak", icon: "🌟", category: "streak", condition: { type: "streak_days", value: 365 }, xp_reward: 2000 },
+  { slug: "streak_3", title: "On a Roll", description: "Keep a 3-day streak going", icon: "🔥", category: "streak", condition: { type: "streak_days", value: 3 }, xp_reward: 20 },
+  { slug: "streak_7", title: "Week Warrior", description: "Keep a 7-day streak going", icon: "🔥", category: "streak", condition: { type: "streak_days", value: 7 }, xp_reward: 50 },
+  { slug: "streak_30", title: "Month Master", description: "Keep a 30-day streak going", icon: "🏆", category: "streak", condition: { type: "streak_days", value: 30 }, xp_reward: 200 },
+  { slug: "streak_100", title: "Century Streak", description: "Keep a 100-day streak going", icon: "💎", category: "streak", condition: { type: "streak_days", value: 100 }, xp_reward: 500 },
+  { slug: "streak_365", title: "Year of Thai", description: "Keep a 365-day streak going", icon: "🌟", category: "streak", condition: { type: "streak_days", value: 365 }, xp_reward: 2000 },
 
   // XP milestones
   { slug: "xp_100", title: "First Steps", description: "Earn 100 XP", icon: "⭐", category: "xp", condition: { type: "total_xp", value: 100 }, xp_reward: 10 },
@@ -29,7 +29,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { slug: "lessons_100", title: "Thai Master", description: "Complete 100 lessons", icon: "👨‍🏫", category: "lessons", condition: { type: "lessons_completed", value: 100 }, xp_reward: 300 },
 
   // Province unlocks
-  { slug: "province_1", title: "Bangkok Explorer", description: "Start your journey in Bangkok", icon: "🏙️", category: "provinces", condition: { type: "provinces_unlocked", value: 1 }, xp_reward: 20 },
+  { slug: "province_1", title: "Bangkok Explorer", description: "Your first stop: Bangkok", icon: "🏙️", category: "provinces", condition: { type: "provinces_unlocked", value: 1 }, xp_reward: 20 },
   { slug: "province_3", title: "Adventurer", description: "Unlock 3 provinces", icon: "🗺️", category: "provinces", condition: { type: "provinces_unlocked", value: 3 }, xp_reward: 75 },
   { slug: "province_5", title: "Traveller", description: "Unlock 5 provinces", icon: "✈️", category: "provinces", condition: { type: "provinces_unlocked", value: 5 }, xp_reward: 150 },
   { slug: "province_10", title: "Thailand Expert", description: "Unlock 10 provinces", icon: "🌏", category: "provinces", condition: { type: "provinces_unlocked", value: 10 }, xp_reward: 500 },

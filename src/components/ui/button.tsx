@@ -4,18 +4,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-extrabold tracking-wide ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
   {
     variants: {
       variant: {
-        default: "bg-orange-500 text-white hover:bg-orange-600 shadow-md hover:shadow-lg",
-        destructive: "bg-red-500 text-white hover:bg-red-600",
-        outline: "border-2 border-orange-500 bg-transparent text-orange-500 hover:bg-orange-50",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
+        default: "btn-3d bg-orange-500 text-white [--btn-edge:#c2410c]",
+        destructive: "btn-3d bg-red-500 text-white [--btn-edge:#b91c1c]",
+        outline: "btn-3d border-2 border-[var(--game-edge)] bg-white text-orange-600 hover:bg-orange-50 [--btn-edge:var(--game-edge)]",
+        secondary: "btn-3d border-2 border-[var(--game-edge)] bg-white text-gray-800 [--btn-edge:var(--game-edge)]",
         ghost: "hover:bg-gray-100 text-gray-700",
         link: "text-orange-500 underline-offset-4 hover:underline",
-        success: "bg-green-500 text-white hover:bg-green-600 shadow-md",
-        gold: "gradient-thai text-white shadow-lg hover:opacity-90",
+        success: "btn-3d bg-green-500 text-white [--btn-edge:#15803d]",
+        gold: "btn-3d gradient-thai text-white [--btn-edge:#b45309]",
       },
       size: {
         default: "h-11 px-6 py-2",

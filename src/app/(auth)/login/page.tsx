@@ -12,15 +12,9 @@ import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppLogoIcon } from "@/components/ui/AppLogoIcon";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const DEMO_MODE = !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
 
 async function createSession(idToken: string) {
   const res = await fetch("/api/auth/session", {
@@ -38,6 +32,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const loginSchema = z.object({
+    email: z.string().email(t("auth.zodEmail")),
+    password: z.string().min(6, t("auth.zodPasswordMin6")),
+  });
+  type LoginForm = z.infer<typeof loginSchema>;
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -59,17 +60,17 @@ export default function LoginPage() {
         code.includes("invalid-credential") ||
         code.includes("invalid-login-credentials")
       ) {
-        setError("Incorrect email or password. If you signed up with Google, tap 'Continue with Google' above.");
+        setError(t("auth.errInvalid"));
       } else if (code.includes("invalid-email")) {
-        setError("Please enter a valid email address.");
+        setError(t("auth.errValidEmail"));
       } else if (code.includes("too-many-requests")) {
-        setError("Too many failed attempts. Wait a few minutes and try again, or reset your password.");
+        setError(t("auth.errTooMany"));
       } else if (code.includes("user-disabled")) {
-        setError("This account has been disabled.");
+        setError(t("auth.errDisabled"));
       } else if (code.includes("operation-not-allowed")) {
-        setError("Email sign-in is not enabled. Please use 'Continue with Google'.");
+        setError(t("auth.errNotAllowed"));
       } else {
-        setError("Sign in failed. Please try again.");
+        setError(t("auth.errFailed"));
       }
     }
   };
@@ -83,7 +84,7 @@ export default function LoginPage() {
       await createSession(idToken);
       router.push("/dashboard");
     } catch {
-      setError("Google sign in failed. Please try again.");
+      setError(t("auth.errGoogle"));
     }
   };
 
@@ -100,8 +101,8 @@ export default function LoginPage() {
             ThaiJN
           </span>
         </Link>
-        <h1 className="text-3xl font-black text-gray-900">Welcome back</h1>
-        <p className="text-gray-500 mt-1">Continue your Thai adventure</p>
+        <h1 className="text-3xl font-black text-gray-900">{t("auth.welcomeBack")}</h1>
+        <p className="text-gray-500 mt-1">{t("auth.continueAdventure")}</p>
       </div>
 
       <button
@@ -115,22 +116,22 @@ export default function LoginPage() {
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
-        Continue with Google
+        {t("auth.continueGoogle")}
       </button>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
-        <div className="relative flex justify-center text-xs text-gray-400 uppercase"><span className="bg-white px-2">or</span></div>
+        <div className="relative flex justify-center text-xs text-gray-400 uppercase"><span className="bg-white px-2">{t("auth.or")}</span></div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
-          <Input type="email" placeholder="you@example.com" {...register("email")} />
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("auth.email")}</label>
+          <Input type="email" placeholder={t("auth.emailPh")} {...register("email")} />
           {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("auth.password")}</label>
           <div className="relative">
             <Input
               type={showPassword ? "text" : "password"}
@@ -151,7 +152,7 @@ export default function LoginPage() {
 
         <div className="flex justify-end">
           <Link href="/forgot-password" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
-            Forgot password?
+            {t("auth.forgotPassword")}
           </Link>
         </div>
 
@@ -162,17 +163,17 @@ export default function LoginPage() {
         )}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Sign In"}
+          {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : t("auth.signIn")}
         </Button>
         <p className="text-center text-xs text-gray-400">
-          Signed up with Google? Use <span className="font-semibold">Continue with Google</span> above
+          {t("auth.googleHint")} <span className="font-semibold">{t("auth.continueGoogle")}</span> {t("auth.googleHintAbove")}
         </p>
       </form>
 
       <p className="text-center text-sm text-gray-500">
-        Don&apos;t have an account?{" "}
+        {t("auth.noAccount")}{" "}
         <Link href="/signup" className="text-orange-500 hover:text-orange-600 font-bold">
-          Create one free
+          {t("auth.createOne")}
         </Link>
       </p>
     </motion.div>

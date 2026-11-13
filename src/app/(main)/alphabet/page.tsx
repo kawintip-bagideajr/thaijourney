@@ -1,101 +1,114 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { CONSONANTS, VOWELS, TONE_MARKS, type ConsonantClass, type ThaiConsonant } from "@/data/alphabet";
 import { ConsonantCard } from "@/components/alphabet/ConsonantCard";
 import { ConsonantDetailModal } from "@/components/alphabet/ConsonantDetailModal";
 import { ToneChart } from "@/components/alphabet/ToneChart";
 import { cn } from "@/lib/utils";
 import { speakThai } from "@/lib/speech";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
-const CLASS_COLORS: Record<ConsonantClass, { bg: string; text: string; badge: string }> = {
-  high: { bg: "bg-blue-50", text: "text-blue-700", badge: "bg-blue-100 text-blue-700" },
-  mid: { bg: "bg-orange-50", text: "text-orange-700", badge: "bg-orange-100 text-orange-700" },
-  low: { bg: "bg-green-50", text: "text-green-700", badge: "bg-green-100 text-green-700" },
+const CLASS_COLORS: Record<ConsonantClass, { badge: string; dot: string }> = {
+  high: { badge: "bg-sky-50 border-sky-200 text-sky-700", dot: "bg-sky-500" },
+  mid: { badge: "bg-orange-50 border-orange-200 text-orange-700", dot: "bg-orange-500" },
+  low: { badge: "bg-green-50 border-green-200 text-green-700", dot: "bg-green-500" },
+};
+
+const FILTER_ACTIVE: Record<ConsonantClass | "all", string> = {
+  all: "bg-orange-500 border-orange-600 text-white [--btn-edge:#c2410c]",
+  high: "bg-sky-500 border-sky-600 text-white [--btn-edge:#0369a1]",
+  mid: "bg-orange-500 border-orange-600 text-white [--btn-edge:#c2410c]",
+  low: "bg-green-500 border-green-600 text-white [--btn-edge:#15803d]",
 };
 
 export default function AlphabetPage() {
   const [activeTab, setActiveTab] = useState<"consonants" | "vowels" | "tones">("consonants");
   const [filterClass, setFilterClass] = useState<ConsonantClass | "all">("all");
   const [selectedConsonant, setSelectedConsonant] = useState<ThaiConsonant | null>(null);
+  const { t } = useTranslation();
 
   const filteredConsonants = filterClass === "all"
     ? CONSONANTS
     : CONSONANTS.filter((c) => c.class === filterClass);
 
   const tabs = [
-    { id: "consonants", label: "Consonants", count: CONSONANTS.length, emoji: "ก" },
-    { id: "vowels", label: "Vowels", count: VOWELS.length, emoji: "อา" },
-    { id: "tones", label: "Tone Marks", count: TONE_MARKS.length, emoji: "่" },
+    { id: "consonants", label: t("alphabet.consonants"), count: CONSONANTS.length, emoji: "ก" },
+    { id: "vowels", label: t("alphabet.vowels"), count: VOWELS.length, emoji: "อา" },
+    { id: "tones", label: t("alphabet.tones"), count: TONE_MARKS.length, emoji: "่" },
   ] as const;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 py-5 space-y-5">
       <ConsonantDetailModal consonant={selectedConsonant} onClose={() => setSelectedConsonant(null)} />
-      <div>
-        <h1 className="text-2xl font-black text-gray-900">Thai Alphabet</h1>
-        <p className="text-gray-500 text-sm mt-1">Master the building blocks of the Thai language</p>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 p-1 bg-gray-100 rounded-2xl">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all",
-              activeTab === tab.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-            )}
-          >
-            <span className="thai-text">{tab.emoji}</span>
-            {tab.label}
-            <span className="text-xs opacity-60">({tab.count})</span>
-          </button>
-        ))}
-      </div>
+      {/* Header: title on the page, then the three script sections as big letter tiles */}
+      <header className="space-y-3">
+        <div className="px-1">
+          <h1 className="font-display text-2xl sm:text-3xl text-gray-900 leading-tight">
+            <span aria-hidden="true">🔤 </span>{t("alphabet.title")}
+          </h1>
+          <p className="text-sm font-bold text-gray-500 mt-1">{t("alphabet.subtitle")}</p>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              aria-pressed={activeTab === tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "btn-3d min-w-0 flex flex-col items-center justify-center gap-1 py-3 sm:py-4 px-1 rounded-3xl border-2 text-xs sm:text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200",
+                activeTab === tab.id
+                  ? "bg-orange-500 border-orange-600 text-white [--btn-edge:#c2410c]"
+                  : "bg-white border-[var(--game-edge)] text-gray-600 [--btn-edge:var(--game-edge)] hover:bg-orange-50"
+              )}
+            >
+              <span className="thai-text font-bold text-3xl sm:text-4xl leading-tight">{tab.emoji}</span>
+              <span className="truncate max-w-full">{tab.label}</span>
+              <span className={cn("text-[10px] tabular-nums", activeTab === tab.id ? "opacity-90" : "opacity-60")}>({tab.count})</span>
+            </button>
+          ))}
+        </div>
+      </header>
 
       {/* Consonants */}
       {activeTab === "consonants" && (
         <div className="space-y-4">
-          {/* Class filter */}
-          <div className="flex flex-wrap gap-2">
-            {(["all", "high", "mid", "low"] as const).map((cls) => (
-              <button
-                key={cls}
-                onClick={() => setFilterClass(cls)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-xs font-bold transition-all border",
-                  filterClass === cls
-                    ? "bg-gray-900 text-white border-gray-900"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                )}
-              >
-                {cls === "all" ? "All Classes" : `${cls.charAt(0).toUpperCase() + cls.slice(1)} Class`}
-              </button>
-            ))}
-          </div>
+          <div className="space-y-2.5">
+            {/* Class filter */}
+            <div className="flex flex-wrap gap-2">
+              {(["all", "high", "mid", "low"] as const).map((cls) => (
+                <button
+                  key={cls}
+                  onClick={() => setFilterClass(cls)}
+                  aria-pressed={filterClass === cls}
+                  className={cn(
+                    "px-4 py-2 rounded-2xl text-xs font-extrabold border-2 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200",
+                    filterClass === cls
+                      ? cn("btn-3d", FILTER_ACTIVE[cls])
+                      : "bg-white text-gray-600 border-[var(--game-edge)] hover:bg-orange-50 hover:-translate-y-0.5"
+                  )}
+                >
+                  {cls === "all"
+                    ? t("alphabet.allClasses")
+                    : t("alphabet.classConsonants", { name: cls === "high" ? t("alphabet.highClass") : cls === "mid" ? t("alphabet.midClass") : t("alphabet.lowClass"), n: CONSONANTS.filter((c) => c.class === cls).length })}
+                </button>
+              ))}
+            </div>
 
-          {/* Legend */}
-          <div className="flex flex-wrap gap-3">
-            {(["high", "mid", "low"] as ConsonantClass[]).map((cls) => (
-              <div key={cls} className={cn("flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold", CLASS_COLORS[cls].badge)}>
-                <div className={cn("w-2 h-2 rounded-full", cls === "high" ? "bg-blue-500" : cls === "mid" ? "bg-orange-500" : "bg-green-500")} />
-                {cls.charAt(0).toUpperCase() + cls.slice(1)} Class — {CONSONANTS.filter((c) => c.class === cls).length} consonants
-              </div>
-            ))}
+            {/* Legend */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 px-1">
+              {(["high", "mid", "low"] as ConsonantClass[]).map((cls) => (
+                <div key={cls} className={cn("flex items-center gap-1.5 text-[11px] font-extrabold !bg-transparent", CLASS_COLORS[cls].badge)}>
+                  <div className={cn("w-2.5 h-2.5 rounded-full", CLASS_COLORS[cls].dot)} />
+                  {t("alphabet.classConsonants", { name: cls === "high" ? t("alphabet.highClass") : cls === "mid" ? t("alphabet.midClass") : t("alphabet.lowClass"), n: CONSONANTS.filter((c) => c.class === cls).length })}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
-            {filteredConsonants.map((consonant, i) => (
-              <motion.div
-                key={consonant.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.02 }}
-              >
-                <ConsonantCard consonant={consonant} onSelect={setSelectedConsonant} />
-              </motion.div>
+            {filteredConsonants.map((consonant) => (
+              <ConsonantCard key={consonant.id} consonant={consonant} onSelect={setSelectedConsonant} />
             ))}
           </div>
         </div>
@@ -105,38 +118,38 @@ export default function AlphabetPage() {
       {activeTab === "vowels" && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {VOWELS.map((vowel, i) => (
-              <motion.div
+            {VOWELS.map((vowel) => (
+              <div
                 key={vowel.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4"
+                className="game-panel p-4 flex items-center gap-4"
               >
                 <button
                   onClick={() => speakThai(vowel.thai.replace("_", ""))}
                   className={cn(
-                    "w-16 h-16 rounded-2xl flex items-center justify-center thai-text text-3xl font-bold flex-shrink-0 hover:opacity-80 transition-opacity active:scale-95",
-                    vowel.length === "long" ? "bg-purple-50 text-purple-800" : "bg-teal-50 text-teal-800"
+                    "btn-3d w-16 rounded-2xl border-2 flex items-center justify-center thai-text text-3xl font-bold flex-shrink-0 overflow-visible focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200",
+                    "py-5 px-2 leading-none",
+                    vowel.length === "long"
+                      ? "bg-purple-50 border-purple-200 text-purple-800 [--btn-edge:#e9d5ff]"
+                      : "bg-teal-50 border-teal-200 text-teal-800 [--btn-edge:#99f6e4]"
                   )}
-                  title="Tap to hear"
+                  title={t("alphabet.tapToHear")}
                 >
                   {vowel.thai}
                 </button>
-                <div className="flex-1">
-                  <p className="font-bold text-gray-900">{vowel.rtgs}</p>
-                  <p className="text-sm text-gray-500">{vowel.ipa}</p>
-                  <div className="flex items-center gap-2 mt-1">
+                <div className="flex-1 min-w-0">
+                  <p className="font-display text-lg text-gray-900 leading-tight">{vowel.rtgs}</p>
+                  <p className="text-sm font-bold text-gray-500">{vowel.ipa}</p>
+                  <div className="flex flex-wrap items-center gap-2 mt-1.5">
                     <span className={cn(
-                      "text-xs px-2 py-0.5 rounded-full font-bold",
-                      vowel.length === "long" ? "bg-purple-100 text-purple-600" : "bg-teal-100 text-teal-600"
+                      "text-[11px] px-2.5 py-0.5 rounded-full font-extrabold border-2",
+                      vowel.length === "long" ? "bg-purple-100 border-purple-200 text-purple-700" : "bg-teal-100 border-teal-200 text-teal-700"
                     )}>
-                      {vowel.length}
+                      {vowel.length === "long" ? t("alphabet.long") : t("alphabet.short")}
                     </span>
-                    <span className="text-xs text-gray-400">e.g. <strong className="thai-text">{vowel.example}</strong> ({vowel.exampleMeaning})</span>
+                    <span className="text-xs font-bold text-gray-400">{t("alphabet.eg")} <strong className="thai-text text-gray-700">{vowel.example}</strong> ({vowel.exampleMeaning})</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -144,42 +157,38 @@ export default function AlphabetPage() {
 
       {/* Tones */}
       {activeTab === "tones" && (
-        <div className="space-y-6">
-          <p className="text-gray-600 text-sm leading-relaxed">
-            Thai has 5 tones: <strong>mid, low, falling, high, and rising</strong>.
-            Tone marks modify the default tone of a syllable based on the consonant class.
-            Getting tones right is essential — the same sounds can mean completely different things!
+        <div className="space-y-5">
+          <p className="flex items-start gap-2 px-1 text-sm font-bold text-gray-600 leading-relaxed">
+            <span aria-hidden="true">🎵</span>
+            <span>{t("alphabet.toneIntro")}</span>
           </p>
 
           {/* Tone mark cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {TONE_MARKS.map((mark, i) => (
-              <motion.div
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {TONE_MARKS.map((mark) => (
+              <div
                 key={mark.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+                className="game-panel p-4"
               >
                 <div className="flex items-center gap-4 mb-3">
-                  <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center">
-                    <span className="thai-text text-3xl font-bold">ก{mark.symbol}</span>
+                  <div className="w-16 h-16 shrink-0 bg-amber-50 border-2 border-amber-200 rounded-2xl flex items-center justify-center">
+                    <span className="thai-text text-3xl font-bold text-amber-700">ก{mark.symbol}</span>
                   </div>
-                  <div>
-                    <p className="font-bold text-gray-900">{mark.name}</p>
-                    <p className="thai-text text-sm text-gray-500">{mark.thai}</p>
+                  <div className="min-w-0">
+                    <p className="font-display text-lg text-gray-900 leading-tight">{mark.name}</p>
+                    <p className="thai-text text-sm font-bold text-gray-500">{mark.thai}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">{mark.description}</p>
-              </motion.div>
+                <p className="text-sm font-semibold text-gray-600 bg-orange-50 border-2 border-orange-100 rounded-2xl px-3 py-2">{mark.description}</p>
+              </div>
             ))}
           </div>
 
           {/* Tone table */}
-          <div>
-            <h3 className="font-bold text-gray-900 mb-3">Tone Chart by Consonant Class</h3>
+          <section className="game-card p-4 sm:p-5">
+            <h3 className="text-lg text-gray-900 mb-3"><span aria-hidden="true">📊 </span>{t("alphabet.toneChartTitle")}</h3>
             <ToneChart />
-          </div>
+          </section>
         </div>
       )}
     </div>

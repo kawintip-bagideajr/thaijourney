@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 interface GoalRingProps {
   current: number;
@@ -7,7 +8,9 @@ interface GoalRingProps {
   unit?: string;
 }
 
-export function GoalRing({ current, goal, unit = "min" }: GoalRingProps) {
+export function GoalRing({ current, goal, unit }: GoalRingProps) {
+  const { t } = useTranslation();
+  const unitLabel = unit ?? t("common.min");
   const pct = Math.min(100, (current / goal) * 100);
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
@@ -40,12 +43,12 @@ export function GoalRing({ current, goal, unit = "min" }: GoalRingProps) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-2xl font-black text-gray-900">{current}</span>
-          <span className="text-xs text-gray-400">/ {goal} {unit}</span>
+          <span className="text-xs text-gray-400">/ {goal} {unitLabel}</span>
         </div>
       </div>
-      <p className="text-sm font-semibold text-gray-600 mt-2">Daily Goal</p>
+      <p className="text-sm font-semibold text-gray-600 mt-2">{t("dash.dailyGoal")}</p>
       <p className={`text-xs ${pct >= 100 ? "text-green-500 font-bold" : "text-gray-400"}`}>
-        {pct >= 100 ? "Goal reached! 🎉" : `${Math.round(pct)}% complete`}
+        {pct >= 100 ? t("dash.goalReached") : t("dash.pctComplete", { n: Math.round(pct) })}
       </p>
     </div>
   );

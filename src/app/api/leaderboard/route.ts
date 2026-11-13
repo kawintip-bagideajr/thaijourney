@@ -1,16 +1,36 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getUserFromSession, adminDb } from "@/lib/firebase/server";
 import { cookies } from "next/headers";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const user = await getUserFromSession(cookieStore.get("__session")?.value);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const type = req.nextUrl.searchParams.get("type") ?? "weekly";
 
-    // Get weekly activity (activity docs for last 7 days)
+    if (type === "allTime") {
+      const snap = await adminDb.collection("users").orderBy("total_xp", "desc").limit(20).get();
+      const leaders = snap.docs.map((doc, rank) => {
+        const p = doc.data();
+        return {
+          rank: rank + 1,
+          id: doc.id,
+          username: p.username,
+          display_name: p.display_name,
+          avatar_url: p.avatar_url,
+          level: p.level,
+          current_streak: p.current_streak,
+          weeklyXP: p.total_xp ?? 0,
+          isCurrentUser: doc.id === user.uid,
+        };
+      });
+      return NextResponse.json({ leaders });
+    }
+
+    // Weekly: sum xp_earned from daily_activity in the last 7 days
+    const oneWeekAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
     const activitySnap = await adminDb
       .collection("daily_activity")
       .where("activity_date", ">=", oneWeekAgo)

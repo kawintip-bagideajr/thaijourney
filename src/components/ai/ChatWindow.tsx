@@ -5,6 +5,7 @@ import { Send, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useSettingsStore, type AppLanguage } from "@/store/settingsStore";
 
 interface Message {
   id: string;
@@ -13,12 +14,63 @@ interface Message {
   timestamp: Date;
 }
 
-const CHAT_SUGGESTIONS = [
-  "How do I say 'Where is the bathroom?'",
-  "Teach me how to count to 10",
-  "What's the polite way to greet someone?",
-  "Help me order food at a restaurant",
-];
+// Suggestions + welcome per app language
+const SUGGESTIONS: Record<AppLanguage, string[]> = {
+  en: [
+    "How do I say 'Where is the bathroom?'",
+    "Teach me how to count to 10",
+    "What's the polite way to greet someone?",
+    "Help me order food at a restaurant",
+  ],
+  th: [
+    "สอนพูด 'ห้องน้ำอยู่ที่ไหน' หน่อยครับ",
+    "สอนนับเลข 1-10 ให้หน่อย",
+    "ทักทายสุภาพเขียนยังไงคะ",
+    "สอนสั่งอาหารในร้านอาหารหน่อยครับ",
+  ],
+  ja: [
+    "「トイレはどこですか？」はタイ語で？",
+    "1から10まで数える方法を教えて",
+    "丁寧な挨拶の仕方は？",
+    "レストランで注文する方法を教えて",
+  ],
+  zh: [
+    "「洗手间在哪里？」用泰语怎么说？",
+    "教我从1数到10",
+    "怎样礼貌地打招呼？",
+    "教我在餐厅点餐",
+  ],
+  ko: [
+    "'화장실이 어디예요?'를 태국어로 어떻게 말해요?",
+    "1부터 10까지 세는 법을 알려주세요",
+    "정중하게 인사하는 방법은?",
+    "식당에서 음식 주문하는 법을 알려주세요",
+  ],
+  fr: [
+    "Comment dit-on « Où sont les toilettes ? »",
+    "Apprenez-moi à compter jusqu'à 10",
+    "Comment saluer poliment ?",
+    "Aidez-moi à commander au restaurant",
+  ],
+};
+
+const WELCOME: Record<AppLanguage, string> = {
+  en: "สวัสดีครับ! 👋 I'm Kru AI, your Thai tutor. We can practice a conversation, or you can ask me about grammar and Thai culture.\n\nWhat do you want to learn today?",
+  th: "สวัสดีครับ! 👋 ผมครูเอไอ มาฝึกพูดภาษาไทยด้วยกัน หรือจะถามเรื่องไวยากรณ์กับวัฒนธรรมไทยก็ได้ครับ\n\nวันนี้อยากเรียนอะไรดี?",
+  ja: "สวัสดีครับ! 👋 私はクルーAI、あなたのタイ語の先生です。会話の練習、文法の説明、タイ文化の質問にお答えします。\n\n今日は何を学びたいですか？",
+  zh: "สวัสดีครับ! 👋 我是Kru AI，你的泰语老师。可以帮你练习会话、解释语法、解答关于泰国文化的问题。\n\n今天想学什么呢？",
+  ko: "สวัสดีครับ! 👋 저는 크루 AI, 당신의 태국어 선생님입니다. 회화 연습, 문법 설명, 태국 문화 질문을 도와드립니다.\n\n오늘은 무엇을 배우고 싶으신가요?",
+  fr: "สวัสดีครับ! 👋 Je suis Kru AI, votre tuteur de thaï. Je peux vous aider à pratiquer la conversation, expliquer la grammaire et répondre aux questions sur la culture thaïlandaise.\n\nQue voulez-vous apprendre aujourd'hui ?",
+};
+
+const PLACEHOLDER: Record<AppLanguage, string> = {
+  en: "Ask me anything about Thai...",
+  th: "ถามเรื่องภาษาไทยได้เลย...",
+  ja: "タイ語について質問してください...",
+  zh: "问我任何关于泰语的问题...",
+  ko: "태국어에 대해 무엇이든 물어보세요...",
+  fr: "Posez-moi une question sur le thaï...",
+};
 
 // Renders **bold**, *italic*, bullet lists, and newlines from AI markdown
 function MessageContent({ content }: { content: string }) {
@@ -58,17 +110,27 @@ function parseInline(text: string) {
 }
 
 export function ChatWindow() {
+  const language = useSettingsStore((s) => s.language);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
-      content: "สวัสดีครับ! 👋 I'm Kru AI, your Thai language tutor. I can help you practice Thai conversation, explain grammar, and answer questions about Thai culture.\n\nWhat would you like to learn today?",
+      content: WELCOME.en,
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Update welcome message when language changes (only while still on the welcome screen)
+  useEffect(() => {
+    setMessages((prev) =>
+      prev.length === 1 && prev[0].id === "welcome"
+        ? [{ ...prev[0], content: WELCOME[language] ?? WELCOME.en }]
+        : prev
+    );
+  }, [language]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,11 +155,12 @@ export function ChatWindow() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          language,
           messages: [...messages, userMsg].map((m) => ({ role: m.role, content: m.content })),
         }),
       });
       const data = await res.json();
-      const reply = data.message || data.error || "ขอโทษครับ — something went wrong. Please try again.";
+      const reply = data.message || data.error || "ขอโทษครับ, something went wrong. Please try again.";
       setMessages((prev) => [
         ...prev,
         { id: (Date.now() + 1).toString(), role: "assistant", content: reply, timestamp: new Date() },
@@ -108,7 +171,7 @@ export function ChatWindow() {
         {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: "ขอโทษครับ — something went wrong. Please try again.",
+          content: "ขอโทษครับ, something went wrong. Please try again.",
           timestamp: new Date(),
         },
       ]);
@@ -118,13 +181,13 @@ export function ChatWindow() {
   };
 
   return (
-    <div className="flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden" style={{ height: "min(600px, calc(100dvh - 280px))" }}>
+    <div className="game-card flex flex-col overflow-hidden" style={{ height: "min(600px, calc(100dvh - 240px))" }}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b bg-gradient-to-r from-orange-50 to-amber-50 flex-shrink-0">
-        <div className="w-10 h-10 gradient-thai rounded-full flex items-center justify-center text-xl">🤖</div>
+      <div className="flex items-center gap-3 px-4 py-3 border-b-2 border-[var(--game-edge)] bg-orange-50/70 flex-shrink-0">
+        <div className="w-11 h-11 rounded-2xl bg-sky-50 border-2 border-sky-200 flex items-center justify-center text-xl" aria-hidden="true">🤖</div>
         <div>
-          <p className="font-bold text-gray-900">Kru AI</p>
-          <p className="text-xs text-green-500 font-medium">● Online</p>
+          <p className="font-display text-gray-900 leading-tight">Kru AI</p>
+          <p className="text-[11px] text-green-600 font-extrabold">● Online</p>
         </div>
       </div>
 
@@ -139,16 +202,16 @@ export function ChatWindow() {
               className={cn("flex gap-3", msg.role === "user" ? "flex-row-reverse" : "flex-row")}
             >
               <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm",
-                msg.role === "assistant" ? "gradient-thai" : "bg-gray-200"
+                "w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 text-base border-2",
+                msg.role === "assistant" ? "bg-sky-50 border-sky-200" : "bg-orange-50 border-orange-200"
               )}>
-                {msg.role === "assistant" ? "🤖" : <User size={14} className="text-gray-500" />}
+                {msg.role === "assistant" ? <span aria-hidden="true">🤖</span> : <User size={15} className="text-orange-500" />}
               </div>
               <div className={cn(
-                "max-w-[80%] px-4 py-3 rounded-2xl text-sm",
+                "max-w-[80%] min-w-0 break-words px-4 py-3 rounded-2xl text-sm font-semibold",
                 msg.role === "assistant"
-                  ? "bg-gray-50 text-gray-800 rounded-tl-sm"
-                  : "bg-orange-500 text-white rounded-tr-sm"
+                  ? "bg-white text-gray-800 rounded-tl-md border-2 border-[var(--game-edge)] shadow-[0_3px_0_var(--game-edge)]"
+                  : "bg-orange-500 text-white rounded-tr-md shadow-[0_3px_0_#c2410c]"
               )}>
                 <MessageContent content={msg.content} />
               </div>
@@ -158,11 +221,11 @@ export function ChatWindow() {
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full gradient-thai flex items-center justify-center">🤖</div>
-            <div className="bg-gray-50 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.15s]" />
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.3s]" />
+            <div className="w-9 h-9 rounded-2xl bg-sky-50 border-2 border-sky-200 flex items-center justify-center" aria-hidden="true">🤖</div>
+            <div className="bg-white border-2 border-[var(--game-edge)] shadow-[0_3px_0_var(--game-edge)] rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-1.5">
+              <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" />
+              <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce [animation-delay:0.15s]" />
+              <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce [animation-delay:0.3s]" />
             </div>
           </div>
         )}
@@ -172,11 +235,11 @@ export function ChatWindow() {
       {/* Suggestions (shown only on welcome) */}
       {messages.length === 1 && (
         <div className="px-4 pb-2 flex flex-wrap gap-2 flex-shrink-0">
-          {CHAT_SUGGESTIONS.map((s) => (
+          {(SUGGESTIONS[language] ?? SUGGESTIONS.en).map((s) => (
             <button
               key={s}
               onClick={() => sendMessage(s)}
-              className="text-xs bg-orange-50 text-orange-600 border border-orange-100 rounded-full px-3 py-1.5 hover:bg-orange-100 transition-colors"
+              className="text-xs font-extrabold bg-orange-50 text-orange-600 border-2 border-orange-200 rounded-2xl px-3 py-1.5 hover:bg-orange-100 hover:-translate-y-0.5 transition"
             >
               {s}
             </button>
@@ -185,20 +248,20 @@ export function ChatWindow() {
       )}
 
       {/* Input */}
-      <div className="flex gap-2 p-4 border-t flex-shrink-0">
+      <div className="flex gap-2 p-3 sm:p-4 border-t-2 border-[var(--game-edge)] flex-shrink-0">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-          placeholder="Ask me anything about Thai..."
-          className="rounded-2xl"
+          placeholder={PLACEHOLDER[language] ?? PLACEHOLDER.en}
+          className="h-12 rounded-2xl border-2 border-[var(--game-edge)] font-bold focus-visible:border-orange-300 focus-visible:ring-4 focus-visible:ring-orange-100"
           disabled={isLoading}
         />
         <Button
           onClick={() => sendMessage()}
           disabled={!input.trim() || isLoading}
           size="icon"
-          className="rounded-2xl flex-shrink-0"
+          className="h-12 w-12 rounded-2xl flex-shrink-0"
         >
           {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
         </Button>
