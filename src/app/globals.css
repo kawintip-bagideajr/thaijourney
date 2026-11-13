@@ -469,9 +469,12 @@
 .theme-dark.dark-accent-sky .tab-pill-active { background-color: #101f38 !important; }
 .theme-dark.dark-accent-sky .accent-orange-500 { accent-color: #38bdf8; }
 
-* {
-  box-sizing: border-box;
-  border-color: var(--border);
+/* Layered so Tailwind border-colour utilities (border-orange-300 …) can override the default. */
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: var(--border);
+  }
 }
 
 html {

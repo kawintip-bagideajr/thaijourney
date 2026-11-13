@@ -45,36 +45,48 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="game-card space-y-6 p-6 sm:p-8">
       {sent ? (
-        <div className="text-center py-8">
-          <Mail size={56} className="text-orange-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-black text-gray-900 mb-2">{t("auth.checkInbox")}</h2>
+        <div className="text-center py-4" role="status">
+          <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full border-[3px] border-[var(--game-edge)] bg-orange-50">
+            <Mail size={48} className="text-orange-500" aria-hidden="true" />
+          </div>
+          <h2 className="text-2xl text-gray-900 mb-2">{t("auth.checkInbox")}</h2>
           <p className="text-gray-500 mb-6">{t("auth.resetSent")}</p>
-          <Link href="/login"><Button>{t("auth.backToLogin")}</Button></Link>
+          <Button asChild size="lg" className="w-full sm:w-auto">
+            <Link href="/login">{t("auth.backToLogin")}</Link>
+          </Button>
         </div>
       ) : (
         <>
-          <div>
-            <h1 className="text-3xl font-black text-gray-900">{t("auth.resetPassword")}</h1>
+          <div className="text-center lg:text-left">
+            <h1 className="text-3xl text-gray-900">{t("auth.resetPassword")}</h1>
             <p className="text-gray-500 mt-1">{t("auth.resetDesc")}</p>
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("auth.email")}</label>
-              <Input type="email" placeholder={t("auth.emailPh")} {...register("email")} />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+              <label htmlFor="reset-email" className="block text-sm font-bold text-gray-700 mb-1.5">{t("auth.email")}</label>
+              <Input
+                id="reset-email"
+                type="email"
+                autoComplete="email"
+                placeholder={t("auth.emailPh")}
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "reset-email-error" : undefined}
+                {...register("email")}
+              />
+              {errors.email && <p id="reset-email-error" role="alert" className="mt-1.5 text-sm font-semibold text-red-600">{errors.email.message}</p>}
             </div>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">{error}</div>
+              <div role="alert" className="rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div>
             )}
             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : t("auth.sendResetLink")}
             </Button>
           </form>
-          <p className="text-center text-sm text-gray-500">
+          <p className="border-t-2 border-dashed border-gray-200 pt-5 text-center text-sm text-gray-500">
             {t("auth.rememberPassword")}{" "}
-            <Link href="/login" className="text-orange-500 font-bold">{t("auth.signInLower")}</Link>
+            <Link href="/login" className="rounded-lg font-bold text-orange-500 hover:text-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300">{t("auth.signInLower")}</Link>
           </p>
         </>
       )}
