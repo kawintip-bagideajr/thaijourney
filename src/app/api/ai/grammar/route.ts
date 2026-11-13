@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       if (!user) {
         return NextResponse.json({ error: "Please log in to use grammar check" }, { status: 401 });
       }
-      const profileDoc = await adminDb.collection("profiles").doc(user.uid).get();
+      const profileDoc = await adminDb.collection("users").doc(user.uid).get();
       const tier = profileDoc.data()?.access_tier ?? "free";
       if (tier !== "pro") {
         return NextResponse.json({ error: "PRO_REQUIRED" }, { status: 403 });

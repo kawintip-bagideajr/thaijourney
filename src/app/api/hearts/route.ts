@@ -10,7 +10,10 @@ export async function PATCH(req: NextRequest) {
     const user = await getUserFromSession(cookieStore.get("__session")?.value);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { heartsLost } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    // Losing hearts only: a negative or non-numeric value must never add hearts.
+    const heartsLost = typeof body.heartsLost === "number" && Number.isFinite(body.heartsLost)
+      ? Math.max(0, Math.floor(body.heartsLost)) : 0;
 
     const profileDoc = await adminDb.collection("users").doc(user.uid).get();
     if (!profileDoc.exists) return NextResponse.json({ error: "Not found" }, { status: 404 });

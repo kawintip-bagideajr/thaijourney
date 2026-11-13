@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  // Diagnostics only: never expose config or other users' data in production.
+  if (process.env.NODE_ENV !== "development") return NextResponse.json({ error: "Not found" }, { status: 404 });
   const key = process.env.STRIPE_SECRET_KEY ?? "";
   return NextResponse.json({
     keyExists: !!key,

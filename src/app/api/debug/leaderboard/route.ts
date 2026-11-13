@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 
 // Temporary debug endpoint — shows raw Firestore state for leaderboard diagnosis
 export async function GET() {
+  // Diagnostics only: never expose config or other users' data in production.
+  if (process.env.NODE_ENV !== "development") return NextResponse.json({ error: "Not found" }, { status: 404 });
   try {
     const cookieStore = await cookies();
     const user = await getUserFromSession(cookieStore.get("__session")?.value);

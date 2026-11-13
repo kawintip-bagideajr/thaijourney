@@ -3,6 +3,7 @@ import { getUserFromSession, adminDb } from "@/lib/firebase/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { cookies } from "next/headers";
 import { levelFromXP, calcCurrentHearts, MAX_HEARTS, MS_PER_HEART } from "@/lib/utils";
+import { getLessonExercises } from "@/data/lessons/index";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,8 +11,20 @@ export async function POST(req: NextRequest) {
     const user = await getUserFromSession(cookieStore.get("__session")?.value);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { lessonSlug, moduleSlug, xpEarned, mistakes, timeMs, heartSacrifice, heartsLost } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { heartSacrifice } = body;
+    const lessonSlug: string | undefined = typeof body.lessonSlug === "string" ? body.lessonSlug : undefined;
+    const moduleSlug: string | undefined = typeof body.moduleSlug === "string" ? body.moduleSlug : undefined;
+    const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0);
+    const mistakes = num(body.mistakes);
+    const timeMs = Math.min(num(body.timeMs), 6 * 60 * 60 * 1000);
+    const heartsLost = num(body.heartsLost);
     const userId = user.uid;
+
+    // Only real lessons count, and XP can't exceed 10 per exercise (the client awards 10 per correct answer).
+    const exerciseCount = lessonSlug && moduleSlug ? getLessonExercises(moduleSlug, lessonSlug).length : 0;
+    if (exerciseCount === 0) return NextResponse.json({ error: "Unknown lesson" }, { status: 400 });
+    const xpEarned = Math.min(num(body.xpEarned), exerciseCount * 10);
 
     // Get current profile
     const profileDoc = await adminDb.collection("users").doc(userId).get();

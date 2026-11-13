@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  // Diagnostics only: never expose config or other users' data in production.
+  if (process.env.NODE_ENV !== "development") return NextResponse.json({ error: "Not found" }, { status: 404 });
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN;
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;

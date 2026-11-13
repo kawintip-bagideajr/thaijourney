@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       const cookieStore = await cookies();
       const user = await getUserFromSession(cookieStore.get("__session")?.value);
       if (user) {
-        const profileDoc = await adminDb.collection("profiles").doc(user.uid).get();
+        const profileDoc = await adminDb.collection("users").doc(user.uid).get();
         const tier = profileDoc.data()?.access_tier ?? "free";
         if (tier !== "pro") {
           return NextResponse.json({ error: "PRO_REQUIRED" }, { status: 403 });

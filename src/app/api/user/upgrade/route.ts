@@ -1,23 +1,9 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { getUserFromSession, adminDb } from "@/lib/firebase/server";
 
+/**
+ * Retired. This used to grant Pro to any signed-in user without payment.
+ * Pro is now set only by the Stripe webhook (/api/stripe/webhook).
+ */
 export async function POST() {
-  try {
-    const cookieStore = await cookies();
-    const user = await getUserFromSession(cookieStore.get("__session")?.value);
-    if (!user) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    await adminDb.collection("profiles").doc(user.uid).set({
-      access_tier: "pro",
-      updated_at: new Date().toISOString(),
-    }, { merge: true });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Upgrade error:", error);
-    return NextResponse.json({ error: "Failed to upgrade" }, { status: 500 });
-  }
+  return NextResponse.json({ error: "Use /subscribe to upgrade" }, { status: 410 });
 }

@@ -2,49 +2,52 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users can read/write their own profile
+    function signedIn() { return request.auth != null; }
+    function ownsDoc() { return signedIn() && resource.data.user_id == request.auth.uid; }
+
+    // ── Profile ────────────────────────────────────────────────────────────
+    // Game state (XP, level, streaks, hearts, Pro tier, boss stamps, cosmetics
+    // owned, role) is written only by the server (Admin SDK bypasses rules).
+    // The client may create a fresh profile and edit the cosmetic/personal fields.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // A frame or title can be equipped only if the server granted it.
+      function equippedIsOwned(field) {
+        return !(field in request.resource.data)
+          || request.resource.data[field] == null
+          || request.resource.data[field] in resource.data.get('cosmetics', {});
+      }
+
+      allow read: if signedIn() && request.auth.uid == userId;
+
+      allow create: if signedIn() && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly([
+             'id', 'username', 'display_name', 'avatar_url', 'bio', 'country',
+             'learning_goal', 'daily_goal_minutes', 'level', 'total_xp',
+             'current_streak', 'longest_streak', 'hearts', 'hearts_updated_at',
+             'role', 'created_at', 'updated_at'])
+        && request.resource.data.total_xp == 0
+        && request.resource.data.level == 1
+        && request.resource.data.current_streak == 0
+        && request.resource.data.longest_streak == 0
+        && request.resource.data.hearts == 5
+        && request.resource.data.role == 'user';
+
+      allow update: if signedIn() && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+             'display_name', 'bio', 'country', 'learning_goal', 'daily_goal_minutes',
+             'avatar_url', 'profile_bg', 'equipped_frame', 'equipped_title', 'updated_at'])
+        && equippedIsOwned('equipped_frame')
+        && equippedIsOwned('equipped_title');
     }
 
-    // Daily activity - user can read/write their own
-    match /daily_activity/{docId} {
-      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
-    }
+    // ── Server-written records: the owner may read, nobody writes from the client ──
+    match /user_lesson_progress/{docId} { allow read: if ownsDoc(); }
+    match /daily_activity/{docId}       { allow read: if ownsDoc(); }
+    match /user_achievements/{docId}    { allow read: if ownsDoc(); }
+    match /user_provinces/{docId}       { allow read: if ownsDoc(); }
+    match /chat_messages/{docId}        { allow read: if ownsDoc(); }
+    match /xp_transactions/{docId}      { allow read: if ownsDoc(); }
 
-    // Lesson progress - user can read/write their own
-    match /user_lesson_progress/{docId} {
-      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
-    }
-
-    // Achievements - user can read their own
-    match /user_achievements/{docId} {
-      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
-    }
-
-    // Provinces - user can read their own
-    match /user_provinces/{docId} {
-      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
-    }
-
-    // Chat messages - user can read/write their own
-    match /chat_messages/{docId} {
-      allow read, write: if request.auth != null && resource.data.user_id == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
-    }
-
-    // XP transactions - user can read their own (server writes only)
-    match /xp_transactions/{docId} {
-      allow read: if request.auth != null && resource.data.user_id == request.auth.uid;
-    }
-
-    // Leaderboard - all authenticated users can read daily_activity
-    match /daily_activity/{docId} {
-      allow read: if request.auth != null;
-    }
+    // Everything else (including the legacy `profiles` collection) is denied by default.
   }
 }
